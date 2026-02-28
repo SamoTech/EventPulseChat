@@ -28,7 +28,7 @@ async function loadLiveScores(sport) {
         
         switch(sport) {
             case 'soccer':
-                data = await fetchESPNScores('soccer/eng.1'); // Premier League
+                data = await fetchAllSoccerLeagues();
                 break;
             case 'nba':
                 data = await fetchESPNScores('basketball/nba');
@@ -64,6 +64,52 @@ async function loadLiveScores(sport) {
     }
 }
 
+// Fetch All Soccer Leagues
+async function fetchAllSoccerLeagues() {
+    const leagues = [
+        { code: 'eng.1', name: 'Premier League' },           // England
+        { code: 'esp.1', name: 'La Liga' },                  // Spain
+        { code: 'ita.1', name: 'Serie A' },                  // Italy
+        { code: 'ger.1', name: 'Bundesliga' },               // Germany
+        { code: 'fra.1', name: 'Ligue 1' },                  // France
+        { code: 'ned.1', name: 'Eredivisie' },               // Netherlands
+        { code: 'uefa.champions', name: 'Champions League' }, // UEFA CL
+        { code: 'uefa.europa', name: 'Europa League' },      // UEFA EL
+        { code: 'uefa.europa.conf', name: 'Conference League' }, // Conference
+        { code: 'fifa.world', name: 'World Cup' }            // FIFA World Cup
+    ];
+    
+    let allGames = [];
+    
+    // Fetch from each league (parallel requests)
+    const promises = leagues.map(async league => {
+        try {
+            const games = await fetchESPNScores(`soccer/${league.code}`);
+            // Add league name to each game
+            return games.map(game => ({
+                ...game,
+                league: league.name
+            }));
+        } catch (error) {
+            console.warn(`Failed to fetch ${league.name}:`, error);
+            return [];
+        }
+    });
+    
+    const results = await Promise.all(promises);
+    allGames = results.flat();
+    
+    // Sort by: Live games first, then by status
+    allGames.sort((a, b) => {
+        if (a.isLive && !b.isLive) return -1;
+        if (!a.isLive && b.isLive) return 1;
+        return 0;
+    });
+    
+    // Limit to 20 games to avoid overwhelming
+    return allGames.slice(0, 20);
+}
+
 // ESPN API (Soccer, NBA, NFL, Tennis, Hockey, Baseball)
 async function fetchESPNScores(league) {
     const url = `https://site.api.espn.com/apis/site/v2/sports/${league}/scoreboard`;
@@ -81,7 +127,7 @@ function parseESPNData(events, league) {
         return [];
     }
     
-    return events.slice(0, 8).map(event => {
+    return events.slice(0, 10).map(event => {
         const competition = event.competitions[0];
         const homeTeam = competition.competitors.find(t => t.homeAway === 'home');
         const awayTeam = competition.competitors.find(t => t.homeAway === 'away');
@@ -189,7 +235,9 @@ function getMockData(sport) {
     const mockData = {
         soccer: [
             { id: 1, team1: 'Man City', team2: 'Arsenal', score1: 2, score2: 1, status: 'FT', isLive: false, league: 'Premier League', venue: 'Etihad Stadium' },
-            { id: 2, team1: 'Liverpool', team2: 'Chelsea', score1: 1, score2: 1, status: "67'", isLive: true, league: 'Premier League', venue: 'Anfield' }
+            { id: 2, team1: 'Liverpool', team2: 'Chelsea', score1: 1, score2: 1, status: "67'", isLive: true, league: 'Premier League', venue: 'Anfield' },
+            { id: 3, team1: 'Real Madrid', team2: 'Barcelona', score1: 2, score2: 2, status: '82\'', isLive: true, league: 'La Liga', venue: 'Santiago Bernabéu' },
+            { id: 4, team1: 'Bayern Munich', team2: 'Dortmund', score1: 3, score2: 1, status: 'FT', isLive: false, league: 'Bundesliga', venue: 'Allianz Arena' }
         ],
         nba: [
             { id: 1, team1: 'Lakers', team2: 'Warriors', score1: 105, score2: 98, status: 'Final', isLive: false, league: 'NBA', venue: 'Crypto.com Arena' },
@@ -486,6 +534,7 @@ window.addEventListener('load', () => {
         const loadTime = perfData.loadEventEnd - perfData.navigationStart;
         console.log(`✅ Dashboard loaded in ${loadTime}ms`);
         console.log(`🔴 LIVE MODE: ESPN + Multi-Sport APIs`);
+        console.log(`⚽ 10+ Soccer Leagues: PL, La Liga, Serie A, Bundesliga, Ligue 1, UCL & more`);
         console.log(`🏆 Sports: Soccer, NBA, NFL, Tennis, Hockey, Baseball, Cricket, MMA`);
         console.log(`👆 Click any game card for detailed view`);
     }
