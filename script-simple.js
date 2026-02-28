@@ -1,10 +1,25 @@
-// SUPER SIMPLE LIVE SCORES - 10+ SPORTS!
-// Uses FREE public APIs - NO signup needed!
+// Event Pulse Chat - Secure Live Sports Dashboard
+// Security Audit Compliant - Feb 2026
 
 let activeSport = 'soccer';
 let refreshInterval = 30;
-let countdownTimer;
+let countdownTimer = null;
+let autoRefreshInterval = null;
 let selectedGame = null;
+let lastFocusedElement = null;
+
+// Rate limiting for refresh buttons
+const refreshCooldowns = new Map();
+const REFRESH_COOLDOWN_MS = 10000; // 10 seconds
+
+// Toast notification system
+function showToast(message) {
+    const toast = document.createElement('div');
+    toast.textContent = message;
+    toast.style.cssText = 'position:fixed;top:20px;right:20px;background:#FF0000;color:#FFF;padding:15px 25px;border-radius:8px;z-index:10000;font-family:Orbitron,sans-serif;font-size:14px;box-shadow:0 4px 20px rgba(255,0,0,0.5);';
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
 
 // Initialize Dashboard
 async function initDashboard() {
@@ -15,11 +30,36 @@ async function initDashboard() {
     setupModalHandlers();
     startAutoRefresh();
     startCountdown();
+    
+    // Register service worker for PWA
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js')
+            .then(() => console.log('[EventPulse] Service Worker registered'))
+            .catch(err => console.warn('[EventPulse] SW registration failed:', err));
+    }
 }
 
-// ===========================================
-// API FETCH FUNCTIONS
-// ===========================================
+// Fetch with timeout and error handling (Issue #3 fix)
+async function fetchWithTimeout(url, timeout = 8000) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+    
+    try {
+        const response = await fetch(url, { signal: controller.signal });
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) {
+            throw new Error(`API returned ${response.status}`);
+        }
+        
+        return await response.json();
+    } catch (error) {
+        clearTimeout(timeoutId);
+        const reason = error.name === 'AbortError' ? 'Request timed out' : error.message;
+        console.warn(`[EventPulse] Fetch failed: ${reason}`);
+        return null;
+    }
+}
 
 // Master Fetch Function
 async function loadLiveScores(sport) {
@@ -56,40 +96,37 @@ async function loadLiveScores(sport) {
         window.sportsData = window.sportsData || {};
         window.sportsData[sport] = data;
         
-        console.log(`✅ Loaded ${data.length} ${sport.toUpperCase()} games`);
+        const count = data ? data.length : 0;
+        console.log(`✅ Loaded ${count} ${sport.toUpperCase()} games`);
     } catch (error) {
         console.error(`Error loading ${sport}:`, error);
         window.sportsData = window.sportsData || {};
-        window.sportsData[sport] = getMockData(sport);
+        window.sportsData[sport] = null;
     }
 }
 
 // Fetch All Soccer Leagues
 async function fetchAllSoccerLeagues() {
     const leagues = [
-        { code: 'eng.1', name: 'Premier League' },           // England
-        { code: 'esp.1', name: 'La Liga' },                  // Spain
-        { code: 'ita.1', name: 'Serie A' },                  // Italy
-        { code: 'ger.1', name: 'Bundesliga' },               // Germany
-        { code: 'fra.1', name: 'Ligue 1' },                  // France
-        { code: 'ned.1', name: 'Eredivisie' },               // Netherlands
-        { code: 'uefa.champions', name: 'Champions League' }, // UEFA CL
-        { code: 'uefa.europa', name: 'Europa League' },      // UEFA EL
-        { code: 'uefa.europa.conf', name: 'Conference League' }, // Conference
-        { code: 'fifa.world', name: 'World Cup' }            // FIFA World Cup
+        { code: 'eng.1', name: 'Premier League' },
+        { code: 'esp.1', name: 'La Liga' },
+        { code: 'ita.1', name: 'Serie A' },
+        { code: 'ger.1', name: 'Bundesliga' },
+        { code: 'fra.1', name: 'Ligue 1' },
+        { code: 'ned.1', name: 'Eredivisie' },
+        { code: 'uefa.champions', name: 'Champions League' },
+        { code: 'uefa.europa', name: 'Europa League' },
+        { code: 'uefa.europa.conf', name: 'Conference League' },
+        { code: 'fifa.world', name: 'World Cup' }
     ];
     
     let allGames = [];
     
-    // Fetch from each league (parallel requests)
     const promises = leagues.map(async league => {
         try {
             const games = await fetchESPNScores(`soccer/${league.code}`);
-            // Add league name to each game
-            return games.map(game => ({
-                ...game,
-                league: league.name
-            }));
+            if (!games) return [];
+            return games.map(game => ({ ...game, league: league.name }));
         } catch (error) {
             console.warn(`Failed to fetch ${league.name}:`, error);
             return [];
@@ -97,42 +134,34 @@ async function fetchAllSoccerLeagues() {
     });
     
     const results = await Promise.all(promises);
-    allGames = results.flat();
+    allGames = results.flat().filter(game => game !== null);
     
-    // Sort by: Live games first, then by status
     allGames.sort((a, b) => {
         if (a.isLive && !b.isLive) return -1;
         if (!a.isLive && b.isLive) return 1;
         return 0;
     });
     
-    // Limit to 20 games to avoid overwhelming
     return allGames.slice(0, 20);
 }
 
-// ESPN API (Soccer, NBA, NFL, Tennis, Hockey, Baseball)
+// ESPN API with timeout
 async function fetchESPNScores(league) {
     const url = `https://site.api.espn.com/apis/site/v2/sports/${league}/scoreboard`;
+    const data = await fetchWithTimeout(url);
     
-    const response = await fetch(url);
-    if (!response.ok) throw new Error('ESPN API failed');
-    
-    const data = await response.json();
-    return parseESPNData(data.events || [], league);
+    if (!data || !data.events) return null;
+    return parseESPNData(data.events, league);
 }
 
-// Parse ESPN Response
+// Parse ESPN Response (XSS-safe - Issue #2 fix)
 function parseESPNData(events, league) {
-    if (!events || events.length === 0) {
-        return [];
-    }
+    if (!events || events.length === 0) return [];
     
     return events.slice(0, 10).map(event => {
         const competition = event.competitions[0];
         const homeTeam = competition.competitors.find(t => t.homeAway === 'home');
         const awayTeam = competition.competitors.find(t => t.homeAway === 'away');
-        
-        // Get venue info
         const venue = competition.venue || {};
         const broadcast = competition.broadcast || event.competitions[0]?.broadcast;
         
@@ -159,23 +188,15 @@ function parseESPNData(events, league) {
     });
 }
 
-// Cricket Scores (ESPN Cricket API)
+// Cricket Scores
 async function fetchCricketScores() {
-    try {
-        const url = 'https://site.api.espn.com/apis/site/v2/sports/cricket/intl/scoreboard';
-        const response = await fetch(url);
-        
-        if (!response.ok) throw new Error('Cricket API failed');
-        
-        const data = await response.json();
-        return parseCricketData(data.events || []);
-    } catch (error) {
-        console.error('Cricket error:', error);
-        return getMockData('cricket');
-    }
+    const url = 'https://site.api.espn.com/apis/site/v2/sports/cricket/intl/scoreboard';
+    const data = await fetchWithTimeout(url);
+    
+    if (!data || !data.events) return null;
+    return parseCricketData(data.events);
 }
 
-// Parse Cricket Response
 function parseCricketData(events) {
     if (!events || events.length === 0) return [];
     
@@ -200,7 +221,6 @@ function parseCricketData(events) {
     });
 }
 
-// Mock MMA Data
 function getMockMMA() {
     return [
         {
@@ -214,70 +234,31 @@ function getMockMMA() {
             league: 'UFC',
             venue: 'T-Mobile Arena',
             city: 'Las Vegas'
-        },
-        {
-            id: 2,
-            team1: 'Contender 1',
-            team2: 'Contender 2',
-            score1: '',
-            score2: '',
-            status: 'Main Card - Tonight',
-            isLive: false,
-            league: 'UFC',
-            venue: 'Madison Square Garden',
-            city: 'New York'
         }
     ];
 }
 
-// Fallback Mock Data
-function getMockData(sport) {
-    const mockData = {
-        soccer: [
-            { id: 1, team1: 'Man City', team2: 'Arsenal', score1: 2, score2: 1, status: 'FT', isLive: false, league: 'Premier League', venue: 'Etihad Stadium' },
-            { id: 2, team1: 'Liverpool', team2: 'Chelsea', score1: 1, score2: 1, status: "67'", isLive: true, league: 'Premier League', venue: 'Anfield' },
-            { id: 3, team1: 'Real Madrid', team2: 'Barcelona', score1: 2, score2: 2, status: '82\'', isLive: true, league: 'La Liga', venue: 'Santiago Bernabéu' },
-            { id: 4, team1: 'Bayern Munich', team2: 'Dortmund', score1: 3, score2: 1, status: 'FT', isLive: false, league: 'Bundesliga', venue: 'Allianz Arena' }
-        ],
-        nba: [
-            { id: 1, team1: 'Lakers', team2: 'Warriors', score1: 105, score2: 98, status: 'Final', isLive: false, league: 'NBA', venue: 'Crypto.com Arena' },
-            { id: 2, team1: 'Celtics', team2: 'Heat', score1: 88, score2: 92, status: 'Q3 - 5:42', isLive: true, league: 'NBA', venue: 'TD Garden' }
-        ],
-        nfl: [
-            { id: 1, team1: 'Chiefs', team2: 'Bills', score1: 27, score2: 24, status: 'Final', isLive: false, league: 'NFL', venue: 'Arrowhead Stadium' }
-        ],
-        tennis: [
-            { id: 1, team1: 'Djokovic', team2: 'Nadal', score1: '6-4, 3-2', score2: '', status: 'Set 2', isLive: true, league: 'ATP', venue: 'Center Court' }
-        ],
-        hockey: [
-            { id: 1, team1: 'Maple Leafs', team2: 'Bruins', score1: 3, score2: 2, status: 'P2 - 12:34', isLive: true, league: 'NHL', venue: 'Scotiabank Arena' }
-        ],
-        baseball: [
-            { id: 1, team1: 'Yankees', team2: 'Red Sox', score1: 5, score2: 3, status: 'Bottom 7th', isLive: true, league: 'MLB', venue: 'Yankee Stadium' }
-        ],
-        cricket: [
-            { id: 1, team1: 'India', team2: 'Australia', score1: '245/5', score2: '', status: 'Innings 1', isLive: true, league: 'Test', venue: 'MCG' }
-        ],
-        mma: getMockMMA()
-    };
-    return mockData[sport] || [];
-}
-
-// ===========================================
-// RENDERING FUNCTIONS
-// ===========================================
-
-// Render Games
+// Render Games (Issue #3 fix - proper error states)
 function renderGames(sport) {
     const container = document.getElementById(`${sport}-games`);
     if (!container) return;
     
     container.innerHTML = '';
+    const games = (window.sportsData && window.sportsData[sport]) || null;
     
-    const games = (window.sportsData && window.sportsData[sport]) || [];
+    if (games === null) {
+        const msg = document.createElement('div');
+        msg.className = 'no-games';
+        msg.textContent = '⚠️ Could not load scores. Retrying in 30s...';
+        container.appendChild(msg);
+        return;
+    }
     
     if (games.length === 0) {
-        container.innerHTML = '<div class="no-games">📅 No live games right now. Check back later!</div>';
+        const msg = document.createElement('div');
+        msg.className = 'no-games';
+        msg.textContent = '📅 No live games right now. Check back later!';
+        container.appendChild(msg);
         return;
     }
     
@@ -287,170 +268,249 @@ function renderGames(sport) {
     });
 }
 
-// Create Game Card
+// Create Game Card (XSS-safe - using textContent - Issue #2 fix)
 function createGameCard(game, sport) {
     const card = document.createElement('div');
     card.className = `game-card ${sport}-card ${game.isLive ? 'live-game' : ''}`;
     card.style.cursor = 'pointer';
     card.setAttribute('data-game-id', game.id);
     card.setAttribute('data-sport', sport);
+    card.setAttribute('role', 'button');
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('aria-label', `${game.team1} vs ${game.team2}, ${game.status}`);
     
-    // Click handler for card
-    card.addEventListener('click', () => {
-        openGameModal(game, sport);
+    card.addEventListener('click', () => openGameModal(game, sport, card));
+    card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            openGameModal(game, sport, card);
+        }
     });
     
-    const liveIndicator = game.isLive ? '<span class="live-badge">🔴 LIVE</span>' : '';
-    const statusHTML = `<div class="game-status ${game.isLive ? 'status-live' : ''}">${liveIndicator} ${game.status}</div>`;
+    const statusDiv = document.createElement('div');
+    statusDiv.className = `game-status ${game.isLive ? 'status-live' : ''}`;
+    if (game.isLive) {
+        const badge = document.createElement('span');
+        badge.className = 'live-badge';
+        badge.textContent = '🔴 LIVE';
+        statusDiv.appendChild(badge);
+        statusDiv.appendChild(document.createTextNode(' '));
+    }
+    statusDiv.appendChild(document.createTextNode(game.status));
     
-    const teamsHTML = `<div class="game-teams">${game.team1} <span class="vs">vs</span> ${game.team2}</div>`;
+    const teamsDiv = document.createElement('div');
+    teamsDiv.className = 'game-teams';
+    teamsDiv.textContent = `${game.team1} `;
+    const vs = document.createElement('span');
+    vs.className = 'vs';
+    vs.textContent = 'vs';
+    teamsDiv.appendChild(vs);
+    teamsDiv.appendChild(document.createTextNode(` ${game.team2}`));
     
-    let scoreHTML = '';
-    if (sport === 'mma') {
-        scoreHTML = game.isLive ? 
-            `<div class="game-score">🥊 LIVE</div>` : 
-            `<div class="game-score">UPCOMING</div>`;
-    } else if (sport === 'cricket') {
-        scoreHTML = `<div class="game-score cricket-score">${game.score1}<br><small>vs</small><br>${game.score2 || 'Yet to bat'}</div>`;
+    const scoreDiv = document.createElement('div');
+    scoreDiv.className = 'game-score';
+    if (sport === 'cricket') {
+        scoreDiv.className += ' cricket-score';
+        scoreDiv.textContent = `${game.score1} vs ${game.score2 || 'Yet to bat'}`;
     } else if (sport === 'tennis') {
-        scoreHTML = `<div class="game-score tennis-score">${game.score1 || '0-0'}</div>`;
+        scoreDiv.className += ' tennis-score';
+        scoreDiv.textContent = game.score1 || '0-0';
     } else {
-        scoreHTML = `<div class="game-score">${game.score1} - ${game.score2}</div>`;
+        scoreDiv.textContent = `${game.score1} - ${game.score2}`;
     }
     
-    const leagueHTML = game.league ? `<div class="game-league">🏆 ${game.league}</div>` : '';
-    const clickHint = '<div class="click-hint">👆 Click for details</div>';
+    const leagueDiv = document.createElement('div');
+    leagueDiv.className = 'game-league';
+    leagueDiv.textContent = `🏆 ${game.league}`;
     
-    card.innerHTML = statusHTML + teamsHTML + scoreHTML + leagueHTML + clickHint;
+    const hintDiv = document.createElement('div');
+    hintDiv.className = 'click-hint';
+    hintDiv.textContent = '👆 Click for details';
+    
+    card.appendChild(statusDiv);
+    card.appendChild(teamsDiv);
+    card.appendChild(scoreDiv);
+    if (game.league) card.appendChild(leagueDiv);
+    card.appendChild(hintDiv);
     
     return card;
 }
 
-// ===========================================
-// MODAL / DETAILED VIEW
-// ===========================================
-
-function openGameModal(game, sport) {
+// Open Modal (XSS-safe + focus trap - Issue #2, #8 fix)
+function openGameModal(game, sport, triggerElement) {
     selectedGame = game;
+    lastFocusedElement = triggerElement;
     
     const modal = document.getElementById('gameModal');
     const modalContent = document.getElementById('modalContent');
     
-    // Build detailed view
-    let detailsHTML = `
-        <div class="modal-header ${game.isLive ? 'modal-live' : ''}">
-            <h2>${game.isLive ? '🔴 LIVE' : ''} ${game.league || sport.toUpperCase()}</h2>
-            <button class="modal-close" onclick="closeGameModal()">✕</button>
-        </div>
-        
-        <div class="modal-status">${game.status}</div>
-        
-        <div class="modal-teams">
-            <div class="modal-team">
-                ${game.team1Logo ? `<img src="${game.team1Logo}" alt="${game.team1}" class="team-logo">` : ''}
-                <div class="team-name">${game.team1}</div>
-                ${game.homeRecord ? `<div class="team-record">${game.homeRecord}</div>` : ''}
-            </div>
-            
-            <div class="modal-score-container">
-    `;
+    modalContent.innerHTML = '';
     
-    // Score display based on sport
-    if (sport === 'mma') {
-        detailsHTML += `<div class="modal-score">🥊 ${game.isLive ? 'LIVE FIGHT' : 'UPCOMING'}</div>`;
-    } else if (sport === 'cricket') {
-        detailsHTML += `
-            <div class="modal-score cricket-modal-score">
-                <div>${game.score1}</div>
-                <div class="vs-text">vs</div>
-                <div>${game.score2 || 'Yet to bat'}</div>
-            </div>
-        `;
-    } else if (sport === 'tennis') {
-        detailsHTML += `<div class="modal-score">${game.score1 || '0-0'}</div>`;
-    } else {
-        detailsHTML += `<div class="modal-score">${game.score1} <span class="score-separator">-</span> ${game.score2}</div>`;
+    const header = document.createElement('div');
+    header.className = `modal-header ${game.isLive ? 'modal-live' : ''}`;
+    
+    const title = document.createElement('h2');
+    title.id = 'modal-title';
+    title.textContent = `${game.isLive ? '🔴 LIVE ' : ''}${game.league || sport.toUpperCase()}`;
+    
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'modal-close';
+    closeBtn.textContent = '✕';
+    closeBtn.setAttribute('aria-label', 'Close game details');
+    closeBtn.onclick = closeGameModal;
+    
+    header.appendChild(title);
+    header.appendChild(closeBtn);
+    
+    const statusDiv = document.createElement('div');
+    statusDiv.className = 'modal-status';
+    statusDiv.textContent = game.status;
+    
+    const teamsDiv = document.createElement('div');
+    teamsDiv.className = 'modal-teams';
+    
+    const team1Div = document.createElement('div');
+    team1Div.className = 'modal-team';
+    if (game.team1Logo) {
+        const img = document.createElement('img');
+        img.src = game.team1Logo;
+        img.alt = game.team1;
+        img.className = 'team-logo';
+        team1Div.appendChild(img);
+    }
+    const team1Name = document.createElement('div');
+    team1Name.className = 'team-name';
+    team1Name.textContent = game.team1;
+    team1Div.appendChild(team1Name);
+    if (game.homeRecord) {
+        const record = document.createElement('div');
+        record.className = 'team-record';
+        record.textContent = game.homeRecord;
+        team1Div.appendChild(record);
     }
     
-    detailsHTML += `
-            </div>
-            
-            <div class="modal-team">
-                ${game.team2Logo ? `<img src="${game.team2Logo}" alt="${game.team2}" class="team-logo">` : ''}
-                <div class="team-name">${game.team2}</div>
-                ${game.awayRecord ? `<div class="team-record">${game.awayRecord}</div>` : ''}
-            </div>
-        </div>
-        
-        <div class="modal-details">
-            ${game.venue ? `<div class="detail-item"><span class="detail-icon">🏟️</span> ${game.venue}${game.city ? ', ' + game.city : ''}</div>` : ''}
-            ${game.attendance ? `<div class="detail-item"><span class="detail-icon">👥</span> Attendance: ${game.attendance.toLocaleString()}</div>` : ''}
-            ${game.broadcast ? `<div class="detail-item"><span class="detail-icon">📺</span> ${game.broadcast}</div>` : ''}
-            ${game.odds ? `<div class="detail-item"><span class="detail-icon">🎲</span> ${game.odds}</div>` : ''}
-        </div>
-        
-        <div class="modal-footer">
-            <button class="modal-button" onclick="closeGameModal()">Close</button>
-            <button class="modal-button refresh-button" onclick="refreshGameData()">🔄 Refresh</button>
-        </div>
-    `;
+    const scoreContainer = document.createElement('div');
+    scoreContainer.className = 'modal-score-container';
+    const scoreDiv = document.createElement('div');
+    scoreDiv.className = 'modal-score';
+    scoreDiv.textContent = `${game.score1} - ${game.score2}`;
+    scoreContainer.appendChild(scoreDiv);
     
-    modalContent.innerHTML = detailsHTML;
+    const team2Div = document.createElement('div');
+    team2Div.className = 'modal-team';
+    if (game.team2Logo) {
+        const img = document.createElement('img');
+        img.src = game.team2Logo;
+        img.alt = game.team2;
+        img.className = 'team-logo';
+        team2Div.appendChild(img);
+    }
+    const team2Name = document.createElement('div');
+    team2Name.className = 'team-name';
+    team2Name.textContent = game.team2;
+    team2Div.appendChild(team2Name);
+    if (game.awayRecord) {
+        const record = document.createElement('div');
+        record.className = 'team-record';
+        record.textContent = game.awayRecord;
+        team2Div.appendChild(record);
+    }
+    
+    teamsDiv.appendChild(team1Div);
+    teamsDiv.appendChild(scoreContainer);
+    teamsDiv.appendChild(team2Div);
+    
+    const detailsDiv = document.createElement('div');
+    detailsDiv.className = 'modal-details';
+    
+    if (game.venue) {
+        const venueItem = document.createElement('div');
+        venueItem.className = 'detail-item';
+        const icon = document.createElement('span');
+        icon.className = 'detail-icon';
+        icon.textContent = '🏟️';
+        venueItem.appendChild(icon);
+        venueItem.appendChild(document.createTextNode(` ${game.venue}${game.city ? ', ' + game.city : ''}`));
+        detailsDiv.appendChild(venueItem);
+    }
+    
+    const footer = document.createElement('div');
+    footer.className = 'modal-footer';
+    
+    const closeButton = document.createElement('button');
+    closeButton.className = 'modal-button';
+    closeButton.textContent = 'Close';
+    closeButton.onclick = closeGameModal;
+    
+    const refreshButton = document.createElement('button');
+    refreshButton.className = 'modal-button refresh-button';
+    refreshButton.textContent = '🔄 Refresh';
+    refreshButton.onclick = () => refreshGameData(game.id);
+    
+    footer.appendChild(closeButton);
+    footer.appendChild(refreshButton);
+    
+    modalContent.appendChild(header);
+    modalContent.appendChild(statusDiv);
+    modalContent.appendChild(teamsDiv);
+    if (detailsDiv.children.length > 0) modalContent.appendChild(detailsDiv);
+    modalContent.appendChild(footer);
+    
+    modal.removeAttribute('hidden');
     modal.style.display = 'flex';
+    setTimeout(() => modal.classList.add('modal-active'), 10);
     
-    // Animate in
-    setTimeout(() => {
-        modal.classList.add('modal-active');
-    }, 10);
+    closeBtn.focus();
+    document.addEventListener('keydown', handleModalKeydown);
 }
 
 function closeGameModal() {
     const modal = document.getElementById('gameModal');
     modal.classList.remove('modal-active');
+    document.removeEventListener('keydown', handleModalKeydown);
     
     setTimeout(() => {
         modal.style.display = 'none';
+        modal.setAttribute('hidden', '');
         selectedGame = null;
+        if (lastFocusedElement) lastFocusedElement.focus();
     }, 300);
 }
 
-async function refreshGameData() {
-    if (!selectedGame) return;
+function handleModalKeydown(e) {
+    if (e.key === 'Escape') closeGameModal();
+}
+
+// Refresh with rate limiting (Issue #7 fix)
+async function refreshGameData(gameId) {
+    const now = Date.now();
+    const lastRefresh = refreshCooldowns.get(gameId) ?? 0;
+    const remaining = REFRESH_COOLDOWN_MS - (now - lastRefresh);
     
-    console.log('🔄 Refreshing game data...');
+    if (remaining > 0) {
+        showToast(`Please wait ${Math.ceil(remaining / 1000)}s before refreshing`);
+        return;
+    }
+    
+    refreshCooldowns.set(gameId, now);
     await loadLiveScores(activeSport);
     
-    // Find updated game
     const games = window.sportsData[activeSport] || [];
-    const updatedGame = games.find(g => g.id === selectedGame.id);
+    const updatedGame = games.find(g => g.id === gameId);
     
     if (updatedGame) {
-        openGameModal(updatedGame, activeSport);
+        openGameModal(updatedGame, activeSport, lastFocusedElement);
     }
 }
 
 function setupModalHandlers() {
     const modal = document.getElementById('gameModal');
-    
-    // Close on background click
     modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            closeGameModal();
-        }
-    });
-    
-    // Close on Escape key
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && modal.style.display === 'flex') {
-            closeGameModal();
-        }
+        if (e.target === modal) closeGameModal();
     });
 }
 
-// ===========================================
-// TAB SWITCHING
-// ===========================================
-
+// Tab Switching (Issue #4 fix - proper cleanup)
 function setupTabSwitching() {
     const tabButtons = document.querySelectorAll('.tab-button');
     
@@ -458,12 +518,22 @@ function setupTabSwitching() {
         button.addEventListener('click', async () => {
             const sport = button.getAttribute('data-sport');
             
-            tabButtons.forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            tabButtons.forEach(btn => {
+                btn.classList.remove('active');
+                btn.setAttribute('aria-selected', 'false');
+            });
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+                tab.setAttribute('hidden', '');
+            });
             
             button.classList.add('active');
-            document.getElementById(sport).classList.add('active');
+            button.setAttribute('aria-selected', 'true');
+            const panel = document.getElementById(`${sport}-panel`);
+            panel.classList.add('active');
+            panel.removeAttribute('hidden');
             
+            stopAutoRefresh();
             activeSport = sport;
             
             if (!window.sportsData || !window.sportsData[sport]) {
@@ -471,16 +541,18 @@ function setupTabSwitching() {
             }
             
             renderGames(sport);
+            startAutoRefresh();
         });
     });
 }
 
-// ===========================================
-// AUTO REFRESH
-// ===========================================
-
+// Auto Refresh (Issue #4 fix - memory leak)
 function startAutoRefresh() {
-    setInterval(async () => {
+    stopAutoRefresh();
+    
+    autoRefreshInterval = setInterval(async () => {
+        if (document.visibilityState === 'hidden') return;
+        
         console.log(`🔄 Refreshing ${activeSport} scores...`);
         await loadLiveScores(activeSport);
         renderGames(activeSport);
@@ -488,44 +560,36 @@ function startAutoRefresh() {
     }, 30000);
 }
 
+function stopAutoRefresh() {
+    if (autoRefreshInterval !== null) {
+        clearInterval(autoRefreshInterval);
+        autoRefreshInterval = null;
+    }
+}
+
 function startCountdown() {
-    const timerElement = document.getElementById('refreshTimer');
+    if (countdownTimer) clearInterval(countdownTimer);
     
+    const timerElement = document.getElementById('refreshTimer');
     countdownTimer = setInterval(() => {
         refreshInterval--;
-        
-        if (refreshInterval <= 0) {
-            refreshInterval = 30;
-        }
-        
+        if (refreshInterval <= 0) refreshInterval = 30;
         timerElement.textContent = `Next update: ${refreshInterval}s`;
     }, 1000);
 }
 
-// ===========================================
-// MOBILE SUPPORT
-// ===========================================
+// Cleanup on unload
+window.addEventListener('beforeunload', () => {
+    stopAutoRefresh();
+    if (countdownTimer) clearInterval(countdownTimer);
+});
 
+// Mobile support
 if ('ontouchstart' in window) {
     document.body.classList.add('touch-enabled');
 }
 
-if (window.innerWidth <= 768) {
-    document.addEventListener('gesturestart', function(e) {
-        e.preventDefault();
-    });
-    
-    document.addEventListener('touchmove', function(e) {
-        if (e.scale !== 1) {
-            e.preventDefault();
-        }
-    }, { passive: false });
-}
-
-// ===========================================
-// INITIALIZE
-// ===========================================
-
+// Initialize
 window.addEventListener('DOMContentLoaded', initDashboard);
 
 window.addEventListener('load', () => {
@@ -537,5 +601,6 @@ window.addEventListener('load', () => {
         console.log(`⚽ 10+ Soccer Leagues: PL, La Liga, Serie A, Bundesliga, Ligue 1, UCL & more`);
         console.log(`🏆 Sports: Soccer, NBA, NFL, Tennis, Hockey, Baseball, Cricket, MMA`);
         console.log(`👆 Click any game card for detailed view`);
+        console.log(`🔒 Security: XSS protection enabled, CSP active`);
     }
 });
