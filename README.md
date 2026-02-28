@@ -3,7 +3,7 @@
 <div align="center">
 
 [![Live Demo](https://img.shields.io/badge/🔴_LIVE_DEMO-Visit_Dashboard-00FF00?style=for-the-badge&logo=github)](https://samotech.github.io/EventPulseChat/)
-[![YouTube Channel](https://img.shields.io/youtube/channel/subscribers/UCYourChannelID?style=for-the-badge&logo=youtube&label=Subscribe&color=FF0000)](https://www.youtube.com/@EventPulseChat)
+[![YouTube Channel](https://img.shields.io/youtube/channel/subscribers/UCW4W4H_lEYd1CPZpYpjVfXA?style=for-the-badge&logo=youtube&label=Subscribe&color=FF0000)](https://www.youtube.com/@EventPulseChat)
 [![GitHub Stars](https://img.shields.io/github/stars/SamoTech/EventPulseChat?style=for-the-badge&logo=github&color=FFFF00)](https://github.com/SamoTech/EventPulseChat/stargazers)
 [![GitHub Forks](https://img.shields.io/github/forks/SamoTech/EventPulseChat?style=for-the-badge&logo=github&color=00FF00)](https://github.com/SamoTech/EventPulseChat/network/members)
 [![GitHub Issues](https://img.shields.io/github/issues/SamoTech/EventPulseChat?style=for-the-badge&logo=github)](https://github.com/SamoTech/EventPulseChat/issues)
@@ -29,6 +29,7 @@ Broadcast-quality sports dashboard optimized for OBS, featuring **8 major sports
 **Subscribe to our channel for tutorials, updates, and live sports coverage!**
 
 [![YouTube](https://img.shields.io/badge/🔴_SUBSCRIBE-Event_Pulse_Chat-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/@EventPulseChat)
+[![Channel Link](https://img.shields.io/youtube/channel/subscribers/UCW4W4H_lEYd1CPZpYpjVfXA?style=social&logo=youtube&label=Subscribe)](https://www.youtube.com/channel/UCW4W4H_lEYd1CPZpYpjVfXA)
 
 📹 **What You'll Find:**
 - Dashboard setup tutorials
@@ -37,7 +38,7 @@ Broadcast-quality sports dashboard optimized for OBS, featuring **8 major sports
 - Feature updates & demos
 - Sports highlights & analysis
 
-👉 **[Visit Channel](https://www.youtube.com/@EventPulseChat)**
+👉 **[Visit Channel](https://www.youtube.com/channel/UCW4W4H_lEYd1CPZpYpjVfXA)**
 
 ---
 
@@ -56,7 +57,7 @@ Broadcast-quality sports dashboard optimized for OBS, featuring **8 major sports
 
 | Sport | Coverage | API | Status |
 |-------|----------|-----|--------|
-| ⚽ **SOCCER** | Premier League, La Liga, Champions League | ESPN | ✅ Live |
+| ⚽ **SOCCER** | 10+ Leagues (PL, La Liga, UCL, etc.) | ESPN | ✅ Live |
 | 🏀 **NBA** | All teams, real-time scores | ESPN | ✅ Live |
 | 🏈 **NFL** | All teams, real-time scores | ESPN | ✅ Live |
 | 🎾 **TENNIS** | ATP & WTA tournaments | ESPN | ✅ Live |
@@ -64,6 +65,19 @@ Broadcast-quality sports dashboard optimized for OBS, featuring **8 major sports
 | ⚾ **BASEBALL** | MLB all games | ESPN | ✅ Live |
 | 🏏 **CRICKET** | International matches | ESPN | ✅ Live |
 | 🥊 **MMA/UFC** | Fight cards & events | Mock | 📅 Upcoming |
+
+### ⚽ Soccer Leagues Included
+
+- 🏴󠁧󠁢󠁥󠁮󠁧󠁿 **Premier League** (England)
+- 🇪🇸 **La Liga** (Spain)
+- 🇮🇹 **Serie A** (Italy)
+- 🇩🇪 **Bundesliga** (Germany)
+- 🇫🇷 **Ligue 1** (France)
+- 🇳🇱 **Eredivisie** (Netherlands)
+- 🏆 **UEFA Champions League**
+- 🏆 **UEFA Europa League**
+- 🏆 **UEFA Conference League**
+- 🌍 **FIFA World Cup**
 
 ### 🚀 Core Features
 
@@ -417,7 +431,7 @@ netlify deploy --prod
 
 ## 📈 Roadmap & Future Features
 
-- [ ] 🌍 More soccer leagues (La Liga, Serie A, Bundesliga)
+- [ ] 🌐 More soccer leagues (La Liga, Serie A, Bundesliga)
 - [ ] 📊 Live match statistics (possession, shots, etc.)
 - [ ] 🎮 Gaming integration (Valorant, LoL esports)
 - [ ] 🔔 Browser notifications for goals/scores
@@ -501,12 +515,12 @@ copies of the Software.
 
 - 🐛 **[Report Bug](https://github.com/SamoTech/EventPulseChat/issues/new?labels=bug)**
 - 💡 **[Request Feature](https://github.com/SamoTech/EventPulseChat/issues/new?labels=enhancement)**
-- 📺 **[YouTube Tutorials](https://www.youtube.com/@EventPulseChat)**
+- 📺 **[YouTube Tutorials](https://www.youtube.com/channel/UCW4W4H_lEYd1CPZpYpjVfXA)**
 - 💬 **[GitHub Discussions](https://github.com/SamoTech/EventPulseChat/discussions)**
 
 ### Connect With Us
 
-[![YouTube](https://img.shields.io/badge/YouTube-Event_Pulse_Chat-FF0000?style=flat-square&logo=youtube)](https://www.youtube.com/@EventPulseChat)
+[![YouTube](https://img.shields.io/badge/YouTube-Event_Pulse_Chat-FF0000?style=flat-square&logo=youtube)](https://www.youtube.com/channel/UCW4W4H_lEYd1CPZpYpjVfXA)
 [![GitHub](https://img.shields.io/badge/GitHub-SamoTech-181717?style=flat-square&logo=github)](https://github.com/SamoTech)
 [![Website](https://img.shields.io/badge/Website-Live_Dashboard-00FF00?style=flat-square&logo=google-chrome)](https://samotech.github.io/EventPulseChat/)
 
@@ -517,7 +531,7 @@ copies of the Software.
 | Resource | Link |
 |----------|------|
 | 🔴 **Live Demo** | https://samotech.github.io/EventPulseChat/ |
-| 📺 **YouTube Channel** | https://www.youtube.com/@EventPulseChat |
+| 📺 **YouTube Channel** | https://www.youtube.com/channel/UCW4W4H_lEYd1CPZpYpjVfXA |
 | 📦 **Repository** | https://github.com/SamoTech/EventPulseChat |
 | 🐛 **Issues** | https://github.com/SamoTech/EventPulseChat/issues |
 | 💬 **Discussions** | https://github.com/SamoTech/EventPulseChat/discussions |
@@ -542,12 +556,12 @@ copies of the Software.
 🔴 **LIVE DATA** • ⚽ **SOCCER** • 🏀 **NBA** • 🏈 **NFL** • 🎾 **TENNIS** • 🏒 **HOCKEY** • ⚾ **BASEBALL** • 🏏 **CRICKET** • 🥊 **UFC**
 
 ### Show Your Support:
-⭐ **[Star this repo](https://github.com/SamoTech/EventPulseChat)** • 🔄 **[Fork it](https://github.com/SamoTech/EventPulseChat/fork)** • 📺 **[Subscribe on YouTube](https://www.youtube.com/@EventPulseChat)**
+⭐ **[Star this repo](https://github.com/SamoTech/EventPulseChat)** • 🔄 **[Fork it](https://github.com/SamoTech/EventPulseChat/fork)** • 📺 **[Subscribe on YouTube](https://www.youtube.com/channel/UCW4W4H_lEYd1CPZpYpjVfXA)**
 
 ---
 
 *Last Updated: February 28, 2026*
 
-**Version 2.0** - Now with 8 sports and clickable match details!
+**Version 2.0** - Now with 10+ soccer leagues and clickable match details!
 
 </div>
