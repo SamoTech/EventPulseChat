@@ -183,6 +183,18 @@ body {
     padding-bottom: 20px;
 }
 
+/* Loading State */
+.loading, .no-games {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    font-size: 24px;
+    color: #FFFF00;
+    background: rgba(255, 255, 0, 0.1);
+    border-radius: 15px;
+    border: 2px dashed #FFFF00;
+}
+
 /* Game Card */
 .game-card {
     background: rgba(0, 0, 0, 0.7);
@@ -221,6 +233,38 @@ body {
     box-shadow: 0 10px 40px rgba(0, 255, 0, 0.6);
 }
 
+/* Live Game Badge */
+.live-game {
+    border-color: #00FF00;
+    animation: livePulse 2s ease-in-out infinite;
+}
+
+@keyframes livePulse {
+    0%, 100% {
+        box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 40px rgba(0, 255, 0, 0.8);
+    }
+}
+
+.live-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    background: #00FF00;
+    color: #000000;
+    font-size: 12px;
+    font-weight: 900;
+    border-radius: 5px;
+    margin-right: 8px;
+    animation: blink 1s ease-in-out infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
 .game-status {
     font-size: 16px;
     font-weight: 700;
@@ -229,6 +273,10 @@ body {
     margin-bottom: 15px;
     text-align: center;
     letter-spacing: 2px;
+}
+
+.status-live {
+    color: #00FF00;
 }
 
 .game-teams {

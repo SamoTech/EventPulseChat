@@ -48,22 +48,30 @@
         <main class="content">
             <!-- NBA Tab -->
             <div class="tab-content active" id="nba">
-                <div class="games-grid" id="nba-games"></div>
+                <div class="games-grid" id="nba-games">
+                    <div class="loading">Loading live scores...</div>
+                </div>
             </div>
 
             <!-- NFL Tab -->
             <div class="tab-content" id="nfl">
-                <div class="games-grid" id="nfl-games"></div>
+                <div class="games-grid" id="nfl-games">
+                    <div class="loading">Loading live scores...</div>
+                </div>
             </div>
 
             <!-- Soccer Tab -->
             <div class="tab-content" id="soccer">
-                <div class="games-grid" id="soccer-games"></div>
+                <div class="games-grid" id="soccer-games">
+                    <div class="loading">Loading live scores...</div>
+                </div>
             </div>
 
             <!-- UFC Tab -->
             <div class="tab-content" id="ufc">
-                <div class="games-grid" id="ufc-games"></div>
+                <div class="games-grid" id="ufc-games">
+                    <div class="loading">Loading live scores...</div>
+                </div>
             </div>
         </main>
     </div>
@@ -78,9 +86,7 @@
         </div>
     </footer>
 
-    <!-- Load API Config First -->
-    <script src="api-config.js"></script>
-    <!-- Then Main Script -->
-    <script src="script.js"></script>
+    <!-- SIMPLE VERSION - Just load this one file! -->
+    <script src="script-simple.js"></script>
 </body>
 </html>
