@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Pulse Live Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Fixed Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="live-indicator">
+                <span class="pulse-dot"></span>
+                <span class="live-text">LIVE</span>
+            </div>
+            <h1 class="header-title">🔥 LIVE CHAT ROOM DASHBOARD</h1>
+            <div class="refresh-indicator" id="refreshTimer">Next update: 30s</div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Left Sidebar Tabs -->
+        <aside class="sidebar">
+            <button class="tab-button active" data-sport="nba">
+                <span class="tab-icon">🏀</span>
+                <span class="tab-label">NBA</span>
+            </button>
+            <button class="tab-button" data-sport="nfl">
+                <span class="tab-icon">🏈</span>
+                <span class="tab-label">NFL</span>
+            </button>
+            <button class="tab-button" data-sport="soccer">
+                <span class="tab-icon">⚽</span>
+                <span class="tab-label">SOCCER</span>
+            </button>
+            <button class="tab-button" data-sport="ufc">
+                <span class="tab-icon">🥊</span>
+                <span class="tab-label">UFC</span>
+            </button>
+        </aside>
+
+        <!-- Content Area -->
+        <main class="content">
+            <!-- NBA Tab -->
+            <div class="tab-content active" id="nba">
+                <div class="games-grid" id="nba-games"></div>
+            </div>
+
+            <!-- NFL Tab -->
+            <div class="tab-content" id="nfl">
+                <div class="games-grid" id="nfl-games"></div>
+            </div>
+
+            <!-- Soccer Tab -->
+            <div class="tab-content" id="soccer">
+                <div class="games-grid" id="soccer-games"></div>
+            </div>
+
+            <!-- UFC Tab -->
+            <div class="tab-content" id="ufc">
+                <div class="games-grid" id="ufc-games"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Fixed Footer -->
+    <footer class="footer">
+        <a href="https://omg10.com/4/10663409" target="_blank" rel="noopener noreferrer" class="smartlink-button">
+            🔥 EXCLUSIVE OFFERS: omg10.com (US/CA/AU Deals)
+        </a>
+        <div class="epc-logo">
+            <span>EPC</span>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
