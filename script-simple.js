@@ -241,8 +241,12 @@ function getMockMMA() {
 // Render Games (Issue #3 fix - proper error states)
 function renderGames(sport) {
     const container = document.getElementById(`${sport}-games`);
-    if (!container) return;
+    if (!container) {
+        console.error(`Container not found: ${sport}-games`);
+        return;
+    }
     
+    console.log(`📊 Rendering ${sport} games...`);
     container.innerHTML = '';
     const games = (window.sportsData && window.sportsData[sport]) || null;
     
@@ -266,6 +270,8 @@ function renderGames(sport) {
         const card = createGameCard(game, sport);
         container.appendChild(card);
     });
+    
+    console.log(`✅ Rendered ${games.length} ${sport} games`);
 }
 
 // Create Game Card (XSS-safe - using textContent - Issue #2 fix)
@@ -510,36 +516,53 @@ function setupModalHandlers() {
     });
 }
 
-// Tab Switching (Issue #4 fix - proper cleanup)
+// Tab Switching (FIXED - Issue #4 fix + tab display bug)
 function setupTabSwitching() {
     const tabButtons = document.querySelectorAll('.tab-button');
+    const allPanels = document.querySelectorAll('[role="tabpanel"]');
     
     tabButtons.forEach(button => {
         button.addEventListener('click', async () => {
             const sport = button.getAttribute('data-sport');
+            console.log(`🔄 Switching to ${sport} tab...`);
             
+            // Update tab buttons
             tabButtons.forEach(btn => {
                 btn.classList.remove('active');
                 btn.setAttribute('aria-selected', 'false');
             });
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-                tab.setAttribute('hidden', '');
+            
+            // Hide ALL panels
+            allPanels.forEach(panel => {
+                panel.classList.remove('active');
+                panel.setAttribute('hidden', '');
+                panel.style.display = 'none';
             });
             
+            // Show selected panel
             button.classList.add('active');
             button.setAttribute('aria-selected', 'true');
             const panel = document.getElementById(`${sport}-panel`);
-            panel.classList.add('active');
-            panel.removeAttribute('hidden');
+            if (panel) {
+                panel.classList.add('active');
+                panel.removeAttribute('hidden');
+                panel.style.display = 'block';
+                console.log(`✅ Panel ${sport}-panel is now visible`);
+            } else {
+                console.error(`❌ Panel not found: ${sport}-panel`);
+            }
             
+            // Update state and refresh
             stopAutoRefresh();
             activeSport = sport;
             
+            // Load data if not cached
             if (!window.sportsData || !window.sportsData[sport]) {
+                console.log(`📥 Loading ${sport} data...`);
                 await loadLiveScores(sport);
             }
             
+            // Render games
             renderGames(sport);
             startAutoRefresh();
         });
