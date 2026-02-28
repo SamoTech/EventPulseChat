@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Event Pulse Live Dashboard</title>
+    <title>Event Pulse Live Dashboard - 10+ Sports</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
@@ -17,7 +17,7 @@
                 <span class="pulse-dot"></span>
                 <span class="live-text">LIVE</span>
             </div>
-            <h1 class="header-title">🔥 LIVE CHAT ROOM DASHBOARD</h1>
+            <h1 class="header-title">🔥 LIVE SPORTS DASHBOARD - 10+ SPORTS</h1>
             <div class="refresh-indicator" id="refreshTimer">Next update: 30s</div>
         </div>
     </header>
@@ -26,7 +26,11 @@
     <div class="main-container">
         <!-- Left Sidebar Tabs -->
         <aside class="sidebar">
-            <button class="tab-button active" data-sport="nba">
+            <button class="tab-button active" data-sport="soccer">
+                <span class="tab-icon">⚽</span>
+                <span class="tab-label">SOCCER</span>
+            </button>
+            <button class="tab-button" data-sport="nba">
                 <span class="tab-icon">🏀</span>
                 <span class="tab-label">NBA</span>
             </button>
@@ -34,20 +38,45 @@
                 <span class="tab-icon">🏈</span>
                 <span class="tab-label">NFL</span>
             </button>
-            <button class="tab-button" data-sport="soccer">
-                <span class="tab-icon">⚽</span>
-                <span class="tab-label">SOCCER</span>
+            <button class="tab-button" data-sport="tennis">
+                <span class="tab-icon">🎾</span>
+                <span class="tab-label">TENNIS</span>
             </button>
-            <button class="tab-button" data-sport="ufc">
+            <button class="tab-button" data-sport="hockey">
+                <span class="tab-icon">🏒</span>
+                <span class="tab-label">HOCKEY</span>
+            </button>
+            <button class="tab-button" data-sport="baseball">
+                <span class="tab-icon">⚾</span>
+                <span class="tab-label">BASEBALL</span>
+            </button>
+            <button class="tab-button" data-sport="cricket">
+                <span class="tab-icon">🏏</span>
+                <span class="tab-label">CRICKET</span>
+            </button>
+            <button class="tab-button" data-sport="mma">
                 <span class="tab-icon">🥊</span>
-                <span class="tab-label">UFC</span>
+                <span class="tab-label">MMA/UFC</span>
             </button>
         </aside>
 
         <!-- Content Area -->
         <main class="content">
+            <!-- Soccer Tab -->
+            <div class="tab-content active" id="soccer">
+                <div class="sport-header">
+                    <h2>⚽ Premier League & Top Leagues</h2>
+                </div>
+                <div class="games-grid" id="soccer-games">
+                    <div class="loading">Loading live scores...</div>
+                </div>
+            </div>
+
             <!-- NBA Tab -->
-            <div class="tab-content active" id="nba">
+            <div class="tab-content" id="nba">
+                <div class="sport-header">
+                    <h2>🏀 NBA Live Games</h2>
+                </div>
                 <div class="games-grid" id="nba-games">
                     <div class="loading">Loading live scores...</div>
                 </div>
@@ -55,21 +84,60 @@
 
             <!-- NFL Tab -->
             <div class="tab-content" id="nfl">
+                <div class="sport-header">
+                    <h2>🏈 NFL Live Games</h2>
+                </div>
                 <div class="games-grid" id="nfl-games">
                     <div class="loading">Loading live scores...</div>
                 </div>
             </div>
 
-            <!-- Soccer Tab -->
-            <div class="tab-content" id="soccer">
-                <div class="games-grid" id="soccer-games">
+            <!-- Tennis Tab -->
+            <div class="tab-content" id="tennis">
+                <div class="sport-header">
+                    <h2>🎾 ATP & WTA Live Matches</h2>
+                </div>
+                <div class="games-grid" id="tennis-games">
                     <div class="loading">Loading live scores...</div>
                 </div>
             </div>
 
-            <!-- UFC Tab -->
-            <div class="tab-content" id="ufc">
-                <div class="games-grid" id="ufc-games">
+            <!-- Hockey Tab -->
+            <div class="tab-content" id="hockey">
+                <div class="sport-header">
+                    <h2>🏒 NHL Live Games</h2>
+                </div>
+                <div class="games-grid" id="hockey-games">
+                    <div class="loading">Loading live scores...</div>
+                </div>
+            </div>
+
+            <!-- Baseball Tab -->
+            <div class="tab-content" id="baseball">
+                <div class="sport-header">
+                    <h2>⚾ MLB Live Games</h2>
+                </div>
+                <div class="games-grid" id="baseball-games">
+                    <div class="loading">Loading live scores...</div>
+                </div>
+            </div>
+
+            <!-- Cricket Tab -->
+            <div class="tab-content" id="cricket">
+                <div class="sport-header">
+                    <h2>🏏 International Cricket</h2>
+                </div>
+                <div class="games-grid" id="cricket-games">
+                    <div class="loading">Loading live scores...</div>
+                </div>
+            </div>
+
+            <!-- MMA Tab -->
+            <div class="tab-content" id="mma">
+                <div class="sport-header">
+                    <h2>🥊 UFC & MMA Events</h2>
+                </div>
+                <div class="games-grid" id="mma-games">
                     <div class="loading">Loading live scores...</div>
                 </div>
             </div>
@@ -86,7 +154,7 @@
         </div>
     </footer>
 
-    <!-- SIMPLE VERSION - Just load this one file! -->
+    <!-- Load Script -->
     <script src="script-simple.js"></script>
 </body>
 </html>

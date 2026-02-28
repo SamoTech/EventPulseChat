@@ -13,7 +13,6 @@ body {
     width: 100vw;
 }
 
-/* Header Styles */
 .header {
     position: fixed;
     top: 0;
@@ -52,14 +51,8 @@ body {
 }
 
 @keyframes pulse {
-    0%, 100% {
-        transform: scale(1);
-        opacity: 1;
-    }
-    50% {
-        transform: scale(1.2);
-        opacity: 0.7;
-    }
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 0.7; }
 }
 
 .live-text {
@@ -70,10 +63,10 @@ body {
 }
 
 .header-title {
-    font-size: 36px;
+    font-size: 32px;
     font-weight: 900;
     text-transform: uppercase;
-    letter-spacing: 3px;
+    letter-spacing: 2px;
     text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
 }
 
@@ -87,7 +80,6 @@ body {
     backdrop-filter: blur(10px);
 }
 
-/* Main Container */
 .main-container {
     display: flex;
     margin-top: 80px;
@@ -96,7 +88,6 @@ body {
     overflow: hidden;
 }
 
-/* Sidebar Tabs */
 .sidebar {
     width: 180px;
     background: rgba(0, 0, 0, 0.8);
@@ -104,21 +95,21 @@ body {
     padding: 20px 10px;
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 12px;
     overflow-y: auto;
 }
 
 .tab-button {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 20px 15px;
+    gap: 10px;
+    padding: 15px 12px;
     background: rgba(255, 0, 0, 0.3);
     border: 2px solid rgba(255, 0, 0, 0.5);
-    border-radius: 15px;
+    border-radius: 12px;
     color: #FFFFFF;
     font-family: 'Orbitron', sans-serif;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 700;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -137,22 +128,36 @@ body {
     background: linear-gradient(135deg, #FF0000 0%, #CC0000 100%);
     border-color: #FFFF00;
     box-shadow: 0 0 25px rgba(255, 0, 0, 1);
-    transform: scale(1.1);
+    transform: scale(1.08);
 }
 
 .tab-icon {
-    font-size: 28px;
+    font-size: 24px;
 }
 
 .tab-label {
     letter-spacing: 1px;
+    font-size: 13px;
 }
 
-/* Content Area */
 .content {
     flex: 1;
     padding: 30px;
     overflow-y: auto;
+}
+
+.sport-header {
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(255, 0, 0, 0.5);
+}
+
+.sport-header h2 {
+    font-size: 28px;
+    font-weight: 900;
+    color: #FFFF00;
+    text-transform: uppercase;
+    letter-spacing: 2px;
 }
 
 .tab-content {
@@ -165,17 +170,10 @@ body {
 }
 
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-/* Games Grid */
 .games-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
@@ -183,24 +181,22 @@ body {
     padding-bottom: 20px;
 }
 
-/* Loading State */
 .loading, .no-games {
     grid-column: 1 / -1;
     text-align: center;
     padding: 60px 20px;
-    font-size: 24px;
+    font-size: 22px;
     color: #FFFF00;
     background: rgba(255, 255, 0, 0.1);
     border-radius: 15px;
     border: 2px dashed #FFFF00;
 }
 
-/* Game Card */
 .game-card {
     background: rgba(0, 0, 0, 0.7);
     border: 3px solid #FF0000;
     border-radius: 20px;
-    padding: 30px;
+    padding: 25px;
     backdrop-filter: blur(15px);
     transition: all 0.3s ease;
     position: relative;
@@ -213,18 +209,14 @@ body {
     top: 0;
     left: 0;
     right: 0;
-    height: 5px;
+    height: 4px;
     background: linear-gradient(90deg, #FF0000, #FFFF00, #FF0000);
     animation: shimmer 2s linear infinite;
 }
 
 @keyframes shimmer {
-    0% {
-        transform: translateX(-100%);
-    }
-    100% {
-        transform: translateX(100%);
-    }
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
 }
 
 .game-card:hover {
@@ -233,19 +225,14 @@ body {
     box-shadow: 0 10px 40px rgba(0, 255, 0, 0.6);
 }
 
-/* Live Game Badge */
 .live-game {
     border-color: #00FF00;
     animation: livePulse 2s ease-in-out infinite;
 }
 
 @keyframes livePulse {
-    0%, 100% {
-        box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
-    }
-    50% {
-        box-shadow: 0 0 40px rgba(0, 255, 0, 0.8);
-    }
+    0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 0, 0.5); }
+    50% { box-shadow: 0 0 40px rgba(0, 255, 0, 0.8); }
 }
 
 .live-badge {
@@ -253,7 +240,7 @@ body {
     padding: 4px 10px;
     background: #00FF00;
     color: #000000;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 900;
     border-radius: 5px;
     margin-right: 8px;
@@ -266,13 +253,13 @@ body {
 }
 
 .game-status {
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 700;
     color: #FFFF00;
     text-transform: uppercase;
-    margin-bottom: 15px;
+    margin-bottom: 12px;
     text-align: center;
-    letter-spacing: 2px;
+    letter-spacing: 1.5px;
 }
 
 .status-live {
@@ -280,49 +267,64 @@ body {
 }
 
 .game-teams {
-    font-size: 24px;
+    font-size: 22px;
     font-weight: 700;
     text-transform: uppercase;
     text-align: center;
-    margin-bottom: 20px;
-    letter-spacing: 1px;
+    margin-bottom: 18px;
+    letter-spacing: 0.5px;
     color: #FFFFFF;
+    line-height: 1.4;
+}
+
+.vs {
+    color: #FF0000;
+    font-size: 16px;
+    margin: 0 8px;
 }
 
 .game-score {
-    font-size: 64px;
+    font-size: 56px;
     font-weight: 900;
     text-align: center;
     background: linear-gradient(135deg, #00FF00 0%, #00CC00 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    text-shadow: 0 0 30px rgba(0, 255, 0, 0.5);
-    letter-spacing: 10px;
-    margin: 20px 0;
+    letter-spacing: 8px;
+    margin: 18px 0;
     filter: drop-shadow(0 0 20px rgba(0, 255, 0, 0.8));
 }
 
-.game-details {
-    font-size: 14px;
-    font-weight: 400;
-    color: #CCCCCC;
+.cricket-score, .tennis-score {
+    font-size: 32px;
+    letter-spacing: 2px;
+    line-height: 1.5;
+}
+
+.cricket-score small {
+    font-size: 18px;
+    color: #FFFF00;
+}
+
+.game-league {
+    font-size: 13px;
+    font-weight: 600;
+    color: #00FF00;
     text-align: center;
-    margin-top: 15px;
+    margin: 10px 0;
     letter-spacing: 1px;
 }
 
-/* UFC Specific Styling */
-.ufc-card .game-teams {
-    font-size: 28px;
+.game-details {
+    font-size: 13px;
+    font-weight: 400;
+    color: #CCCCCC;
+    text-align: center;
+    margin-top: 12px;
+    letter-spacing: 1px;
 }
 
-.ufc-card .game-score {
-    font-size: 48px;
-    letter-spacing: 5px;
-}
-
-/* Footer Styles */
 .footer {
     position: fixed;
     bottom: 0;
@@ -386,37 +388,33 @@ body {
     }
     
     .header-title {
-        font-size: 28px;
+        font-size: 24px;
     }
 }
 
 @media (max-width: 768px) {
     .header-content {
         flex-direction: column;
-        gap: 10px;
+        gap: 8px;
         padding: 10px;
     }
     
     .header {
         height: auto;
-        padding: 15px 0;
+        padding: 12px 0;
     }
     
     .header-title {
-        font-size: 20px;
-    }
-    
-    .live-indicator {
-        gap: 5px;
+        font-size: 16px;
     }
     
     .live-text {
-        font-size: 18px;
+        font-size: 16px;
     }
     
     .main-container {
         flex-direction: column;
-        margin-top: 140px;
+        margin-top: 130px;
     }
     
     .sidebar {
@@ -424,18 +422,28 @@ body {
         flex-direction: row;
         border-right: none;
         border-bottom: 2px solid #FF0000;
-        padding: 10px;
+        padding: 8px;
         overflow-x: auto;
+        gap: 8px;
     }
     
     .tab-button {
         flex-direction: column;
-        min-width: 80px;
-        padding: 10px;
+        min-width: 70px;
+        padding: 8px;
+        gap: 4px;
+    }
+    
+    .tab-icon {
+        font-size: 20px;
     }
     
     .tab-label {
-        font-size: 12px;
+        font-size: 10px;
+    }
+    
+    .sport-header h2 {
+        font-size: 20px;
     }
     
     .games-grid {
@@ -444,25 +452,24 @@ body {
     }
     
     .game-score {
-        font-size: 48px;
+        font-size: 42px;
     }
     
     .footer {
         height: auto;
         flex-direction: column;
-        gap: 15px;
-        padding: 15px;
+        gap: 12px;
+        padding: 12px;
     }
     
     .smartlink-button {
-        font-size: 14px;
-        padding: 12px 20px;
+        font-size: 13px;
+        padding: 10px 18px;
     }
 }
 
-/* Custom Scrollbar */
 ::-webkit-scrollbar {
-    width: 12px;
+    width: 10px;
 }
 
 ::-webkit-scrollbar-track {
@@ -471,7 +478,7 @@ body {
 
 ::-webkit-scrollbar-thumb {
     background: linear-gradient(180deg, #FF0000 0%, #CC0000 100%);
-    border-radius: 6px;
+    border-radius: 5px;
     border: 2px solid #000000;
 }
 
@@ -479,7 +486,6 @@ body {
     background: linear-gradient(180deg, #FF0000 0%, #FF0000 100%);
 }
 
-/* OBS Optimization */
 @media (min-width: 1920px) {
     body {
         max-width: 1920px;
