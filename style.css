@@ -220,9 +220,9 @@ body {
 }
 
 .game-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-8px) scale(1.02);
     border-color: #00FF00;
-    box-shadow: 0 10px 40px rgba(0, 255, 0, 0.6);
+    box-shadow: 0 15px 50px rgba(0, 255, 0, 0.6);
 }
 
 .live-game {
@@ -316,13 +316,239 @@ body {
     letter-spacing: 1px;
 }
 
-.game-details {
-    font-size: 13px;
+.click-hint {
+    font-size: 12px;
     font-weight: 400;
-    color: #CCCCCC;
+    color: #FFFF00;
     text-align: center;
     margin-top: 12px;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+.game-card:hover .click-hint {
+    opacity: 1;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.modal.modal-active {
+    opacity: 1;
+}
+
+.modal-container {
+    width: 90%;
+    max-width: 900px;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-body {
+    background: linear-gradient(135deg, #1a0000 0%, #000000 100%);
+    border: 3px solid #FF0000;
+    border-radius: 25px;
+    padding: 40px;
+    box-shadow: 0 0 60px rgba(255, 0, 0, 0.8);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #FF0000;
+}
+
+.modal-header.modal-live {
+    border-bottom-color: #00FF00;
+}
+
+.modal-header h2 {
+    font-size: 32px;
+    font-weight: 900;
+    color: #FFFF00;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.modal-close {
+    width: 50px;
+    height: 50px;
+    background: #FF0000;
+    border: 2px solid #FFFFFF;
+    border-radius: 50%;
+    color: #FFFFFF;
+    font-size: 28px;
+    font-weight: 900;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.modal-close:hover {
+    background: #FFFFFF;
+    color: #FF0000;
+    transform: rotate(90deg);
+}
+
+.modal-status {
+    text-align: center;
+    font-size: 20px;
+    font-weight: 700;
+    color: #FFFF00;
+    margin-bottom: 30px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.modal-teams {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 40px;
+    margin-bottom: 40px;
+}
+
+.modal-team {
+    flex: 1;
+    text-align: center;
+}
+
+.team-logo {
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+    margin-bottom: 20px;
+    filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.5));
+}
+
+.team-name {
+    font-size: 28px;
+    font-weight: 900;
+    color: #FFFFFF;
+    text-transform: uppercase;
+    margin-bottom: 10px;
     letter-spacing: 1px;
+}
+
+.team-record {
+    font-size: 16px;
+    color: #00FF00;
+    font-weight: 700;
+}
+
+.modal-score-container {
+    flex: 0 0 auto;
+    text-align: center;
+}
+
+.modal-score {
+    font-size: 96px;
+    font-weight: 900;
+    background: linear-gradient(135deg, #00FF00 0%, #00CC00 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 15px;
+    filter: drop-shadow(0 0 30px rgba(0, 255, 0, 1));
+    white-space: nowrap;
+}
+
+.score-separator {
+    color: #FFFF00;
+    margin: 0 15px;
+}
+
+.cricket-modal-score {
+    font-size: 42px;
+    letter-spacing: 3px;
+    line-height: 1.6;
+}
+
+.vs-text {
+    font-size: 24px;
+    color: #FF0000;
+    margin: 10px 0;
+}
+
+.modal-details {
+    background: rgba(255, 0, 0, 0.1);
+    border: 2px solid rgba(255, 0, 0, 0.3);
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 30px;
+}
+
+.detail-item {
+    font-size: 18px;
+    color: #FFFFFF;
+    margin: 12px 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.detail-icon {
+    font-size: 24px;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.modal-button {
+    padding: 15px 40px;
+    background: linear-gradient(135deg, #FF0000 0%, #CC0000 100%);
+    color: #FFFFFF;
+    border: 2px solid #FFFF00;
+    border-radius: 25px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.modal-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(255, 255, 0, 0.8);
+    border-color: #00FF00;
+}
+
+.refresh-button {
+    background: linear-gradient(135deg, #00FF00 0%, #00CC00 100%);
+    color: #000000;
+    border-color: #FFFFFF;
 }
 
 .footer {
@@ -390,6 +616,11 @@ body {
     .header-title {
         font-size: 24px;
     }
+    
+    .modal-score {
+        font-size: 72px;
+        letter-spacing: 10px;
+    }
 }
 
 @media (max-width: 768px) {
@@ -453,6 +684,25 @@ body {
     
     .game-score {
         font-size: 42px;
+    }
+    
+    .modal-body {
+        padding: 25px;
+    }
+    
+    .modal-teams {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .modal-score {
+        font-size: 56px;
+        letter-spacing: 5px;
+    }
+    
+    .team-logo {
+        width: 80px;
+        height: 80px;
     }
     
     .footer {

@@ -4,6 +4,7 @@
 let activeSport = 'soccer';
 let refreshInterval = 30;
 let countdownTimer;
+let selectedGame = null;
 
 // Initialize Dashboard
 async function initDashboard() {
@@ -11,6 +12,7 @@ async function initDashboard() {
     await loadLiveScores(activeSport);
     renderGames(activeSport);
     setupTabSwitching();
+    setupModalHandlers();
     startAutoRefresh();
     startCountdown();
 }
@@ -84,22 +86,29 @@ function parseESPNData(events, league) {
         const homeTeam = competition.competitors.find(t => t.homeAway === 'home');
         const awayTeam = competition.competitors.find(t => t.homeAway === 'away');
         
-        // Determine sport type for display
-        let sportName = 'Game';
-        if (league.includes('tennis')) sportName = 'Match';
-        if (league.includes('soccer')) sportName = 'Match';
-        if (league.includes('cricket')) sportName = 'Match';
+        // Get venue info
+        const venue = competition.venue || {};
+        const broadcast = competition.broadcast || event.competitions[0]?.broadcast;
         
         return {
             id: event.id,
             team1: homeTeam?.team?.displayName || homeTeam?.team?.name || 'Home',
             team2: awayTeam?.team?.displayName || awayTeam?.team?.name || 'Away',
+            team1Logo: homeTeam?.team?.logo || '',
+            team2Logo: awayTeam?.team?.logo || '',
             score1: parseInt(homeTeam?.score) || 0,
             score2: parseInt(awayTeam?.score) || 0,
             status: competition.status?.type?.detail || competition.status?.type?.shortDetail || 'Scheduled',
             isLive: competition.status?.type?.state === 'in',
             time: competition.status?.displayClock || '',
-            league: event.league?.name || event.competitions[0]?.league?.name || 'Live'
+            league: event.league?.name || competition.league?.name || 'Live',
+            venue: venue.fullName || 'Stadium',
+            city: venue.address?.city || '',
+            attendance: competition.attendance || '',
+            broadcast: broadcast ? broadcast[0]?.names?.[0] || 'TV' : '',
+            homeRecord: homeTeam?.records?.[0]?.summary || '',
+            awayRecord: awayTeam?.records?.[0]?.summary || '',
+            odds: competition.odds?.[0]?.details || ''
         };
     });
 }
@@ -133,11 +142,14 @@ function parseCricketData(events) {
             id: event.id,
             team1: homeTeam?.team?.displayName || 'Team A',
             team2: awayTeam?.team?.displayName || 'Team B',
+            team1Logo: homeTeam?.team?.logo || '',
+            team2Logo: awayTeam?.team?.logo || '',
             score1: homeTeam?.score || '0/0',
             score2: awayTeam?.score || '0/0',
             status: competition.status?.type?.detail || 'Live',
             isLive: competition.status?.type?.state === 'in',
-            league: event.league?.name || 'International'
+            league: event.league?.name || 'International',
+            venue: competition.venue?.fullName || 'Cricket Ground'
         };
     });
 }
@@ -153,7 +165,9 @@ function getMockMMA() {
             score2: '',
             status: 'UPCOMING - UFC 300',
             isLive: false,
-            league: 'UFC'
+            league: 'UFC',
+            venue: 'T-Mobile Arena',
+            city: 'Las Vegas'
         },
         {
             id: 2,
@@ -163,7 +177,9 @@ function getMockMMA() {
             score2: '',
             status: 'Main Card - Tonight',
             isLive: false,
-            league: 'UFC'
+            league: 'UFC',
+            venue: 'Madison Square Garden',
+            city: 'New York'
         }
     ];
 }
@@ -172,27 +188,27 @@ function getMockMMA() {
 function getMockData(sport) {
     const mockData = {
         soccer: [
-            { id: 1, team1: 'Man City', team2: 'Arsenal', score1: 2, score2: 1, status: 'FT', isLive: false, league: 'Premier League' },
-            { id: 2, team1: 'Liverpool', team2: 'Chelsea', score1: 1, score2: 1, status: '67\'', isLive: true, league: 'Premier League' }
+            { id: 1, team1: 'Man City', team2: 'Arsenal', score1: 2, score2: 1, status: 'FT', isLive: false, league: 'Premier League', venue: 'Etihad Stadium' },
+            { id: 2, team1: 'Liverpool', team2: 'Chelsea', score1: 1, score2: 1, status: "67'", isLive: true, league: 'Premier League', venue: 'Anfield' }
         ],
         nba: [
-            { id: 1, team1: 'Lakers', team2: 'Warriors', score1: 105, score2: 98, status: 'Final', isLive: false, league: 'NBA' },
-            { id: 2, team1: 'Celtics', team2: 'Heat', score1: 88, score2: 92, status: 'Q3 - 5:42', isLive: true, league: 'NBA' }
+            { id: 1, team1: 'Lakers', team2: 'Warriors', score1: 105, score2: 98, status: 'Final', isLive: false, league: 'NBA', venue: 'Crypto.com Arena' },
+            { id: 2, team1: 'Celtics', team2: 'Heat', score1: 88, score2: 92, status: 'Q3 - 5:42', isLive: true, league: 'NBA', venue: 'TD Garden' }
         ],
         nfl: [
-            { id: 1, team1: 'Chiefs', team2: 'Bills', score1: 27, score2: 24, status: 'Final', isLive: false, league: 'NFL' }
+            { id: 1, team1: 'Chiefs', team2: 'Bills', score1: 27, score2: 24, status: 'Final', isLive: false, league: 'NFL', venue: 'Arrowhead Stadium' }
         ],
         tennis: [
-            { id: 1, team1: 'Djokovic', team2: 'Nadal', score1: '6-4, 3-2', score2: '', status: 'Set 2', isLive: true, league: 'ATP' }
+            { id: 1, team1: 'Djokovic', team2: 'Nadal', score1: '6-4, 3-2', score2: '', status: 'Set 2', isLive: true, league: 'ATP', venue: 'Center Court' }
         ],
         hockey: [
-            { id: 1, team1: 'Maple Leafs', team2: 'Bruins', score1: 3, score2: 2, status: 'P2 - 12:34', isLive: true, league: 'NHL' }
+            { id: 1, team1: 'Maple Leafs', team2: 'Bruins', score1: 3, score2: 2, status: 'P2 - 12:34', isLive: true, league: 'NHL', venue: 'Scotiabank Arena' }
         ],
         baseball: [
-            { id: 1, team1: 'Yankees', team2: 'Red Sox', score1: 5, score2: 3, status: 'Bottom 7th', isLive: true, league: 'MLB' }
+            { id: 1, team1: 'Yankees', team2: 'Red Sox', score1: 5, score2: 3, status: 'Bottom 7th', isLive: true, league: 'MLB', venue: 'Yankee Stadium' }
         ],
         cricket: [
-            { id: 1, team1: 'India', team2: 'Australia', score1: '245/5', score2: '', status: 'Innings 1', isLive: true, league: 'Test' }
+            { id: 1, team1: 'India', team2: 'Australia', score1: '245/5', score2: '', status: 'Innings 1', isLive: true, league: 'Test', venue: 'MCG' }
         ],
         mma: getMockMMA()
     };
@@ -227,6 +243,14 @@ function renderGames(sport) {
 function createGameCard(game, sport) {
     const card = document.createElement('div');
     card.className = `game-card ${sport}-card ${game.isLive ? 'live-game' : ''}`;
+    card.style.cursor = 'pointer';
+    card.setAttribute('data-game-id', game.id);
+    card.setAttribute('data-sport', sport);
+    
+    // Click handler for card
+    card.addEventListener('click', () => {
+        openGameModal(game, sport);
+    });
     
     const liveIndicator = game.isLive ? '<span class="live-badge">🔴 LIVE</span>' : '';
     const statusHTML = `<div class="game-status ${game.isLive ? 'status-live' : ''}">${liveIndicator} ${game.status}</div>`;
@@ -247,11 +271,132 @@ function createGameCard(game, sport) {
     }
     
     const leagueHTML = game.league ? `<div class="game-league">🏆 ${game.league}</div>` : '';
-    const sourceHTML = `<div class="game-details">📡 ESPN Live Feed</div>`;
+    const clickHint = '<div class="click-hint">👆 Click for details</div>';
     
-    card.innerHTML = statusHTML + teamsHTML + scoreHTML + leagueHTML + sourceHTML;
+    card.innerHTML = statusHTML + teamsHTML + scoreHTML + leagueHTML + clickHint;
     
     return card;
+}
+
+// ===========================================
+// MODAL / DETAILED VIEW
+// ===========================================
+
+function openGameModal(game, sport) {
+    selectedGame = game;
+    
+    const modal = document.getElementById('gameModal');
+    const modalContent = document.getElementById('modalContent');
+    
+    // Build detailed view
+    let detailsHTML = `
+        <div class="modal-header ${game.isLive ? 'modal-live' : ''}">
+            <h2>${game.isLive ? '🔴 LIVE' : ''} ${game.league || sport.toUpperCase()}</h2>
+            <button class="modal-close" onclick="closeGameModal()">✕</button>
+        </div>
+        
+        <div class="modal-status">${game.status}</div>
+        
+        <div class="modal-teams">
+            <div class="modal-team">
+                ${game.team1Logo ? `<img src="${game.team1Logo}" alt="${game.team1}" class="team-logo">` : ''}
+                <div class="team-name">${game.team1}</div>
+                ${game.homeRecord ? `<div class="team-record">${game.homeRecord}</div>` : ''}
+            </div>
+            
+            <div class="modal-score-container">
+    `;
+    
+    // Score display based on sport
+    if (sport === 'mma') {
+        detailsHTML += `<div class="modal-score">🥊 ${game.isLive ? 'LIVE FIGHT' : 'UPCOMING'}</div>`;
+    } else if (sport === 'cricket') {
+        detailsHTML += `
+            <div class="modal-score cricket-modal-score">
+                <div>${game.score1}</div>
+                <div class="vs-text">vs</div>
+                <div>${game.score2 || 'Yet to bat'}</div>
+            </div>
+        `;
+    } else if (sport === 'tennis') {
+        detailsHTML += `<div class="modal-score">${game.score1 || '0-0'}</div>`;
+    } else {
+        detailsHTML += `<div class="modal-score">${game.score1} <span class="score-separator">-</span> ${game.score2}</div>`;
+    }
+    
+    detailsHTML += `
+            </div>
+            
+            <div class="modal-team">
+                ${game.team2Logo ? `<img src="${game.team2Logo}" alt="${game.team2}" class="team-logo">` : ''}
+                <div class="team-name">${game.team2}</div>
+                ${game.awayRecord ? `<div class="team-record">${game.awayRecord}</div>` : ''}
+            </div>
+        </div>
+        
+        <div class="modal-details">
+            ${game.venue ? `<div class="detail-item"><span class="detail-icon">🏟️</span> ${game.venue}${game.city ? ', ' + game.city : ''}</div>` : ''}
+            ${game.attendance ? `<div class="detail-item"><span class="detail-icon">👥</span> Attendance: ${game.attendance.toLocaleString()}</div>` : ''}
+            ${game.broadcast ? `<div class="detail-item"><span class="detail-icon">📺</span> ${game.broadcast}</div>` : ''}
+            ${game.odds ? `<div class="detail-item"><span class="detail-icon">🎲</span> ${game.odds}</div>` : ''}
+        </div>
+        
+        <div class="modal-footer">
+            <button class="modal-button" onclick="closeGameModal()">Close</button>
+            <button class="modal-button refresh-button" onclick="refreshGameData()">🔄 Refresh</button>
+        </div>
+    `;
+    
+    modalContent.innerHTML = detailsHTML;
+    modal.style.display = 'flex';
+    
+    // Animate in
+    setTimeout(() => {
+        modal.classList.add('modal-active');
+    }, 10);
+}
+
+function closeGameModal() {
+    const modal = document.getElementById('gameModal');
+    modal.classList.remove('modal-active');
+    
+    setTimeout(() => {
+        modal.style.display = 'none';
+        selectedGame = null;
+    }, 300);
+}
+
+async function refreshGameData() {
+    if (!selectedGame) return;
+    
+    console.log('🔄 Refreshing game data...');
+    await loadLiveScores(activeSport);
+    
+    // Find updated game
+    const games = window.sportsData[activeSport] || [];
+    const updatedGame = games.find(g => g.id === selectedGame.id);
+    
+    if (updatedGame) {
+        openGameModal(updatedGame, activeSport);
+    }
+}
+
+function setupModalHandlers() {
+    const modal = document.getElementById('gameModal');
+    
+    // Close on background click
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            closeGameModal();
+        }
+    });
+    
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.style.display === 'flex') {
+            closeGameModal();
+        }
+    });
 }
 
 // ===========================================
@@ -342,5 +487,6 @@ window.addEventListener('load', () => {
         console.log(`✅ Dashboard loaded in ${loadTime}ms`);
         console.log(`🔴 LIVE MODE: ESPN + Multi-Sport APIs`);
         console.log(`🏆 Sports: Soccer, NBA, NFL, Tennis, Hockey, Baseball, Cricket, MMA`);
+        console.log(`👆 Click any game card for detailed view`);
     }
 });
