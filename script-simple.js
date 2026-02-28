@@ -1,5 +1,6 @@
 // Event Pulse Chat - Secure Live Sports Dashboard
 // Security Audit Compliant - Feb 2026
+// Tab Navigation Fixed - All 3 bugs resolved
 
 let activeSport = 'soccer';
 let refreshInterval = 30;
@@ -24,6 +25,7 @@ function showToast(message) {
 // Initialize Dashboard
 async function initDashboard() {
     console.log('🔴 Loading LIVE scores from multiple sources...');
+    // BUG FIX: Only load Soccer on initial page load
     await loadLiveScores(activeSport);
     renderGames(activeSport);
     setupTabSwitching();
@@ -242,7 +244,7 @@ function getMockMMA() {
 function renderGames(sport) {
     const container = document.getElementById(`${sport}-games`);
     if (!container) {
-        console.error(`Container not found: ${sport}-games`);
+        console.error(`❌ Container not found: ${sport}-games`);
         return;
     }
     
@@ -271,7 +273,7 @@ function renderGames(sport) {
         container.appendChild(card);
     });
     
-    console.log(`✅ Rendered ${games.length} ${sport} games`);
+    console.log(`✅ Rendered ${games.length} ${sport} game(s)`);
 }
 
 // Create Game Card (XSS-safe - using textContent - Issue #2 fix)
@@ -516,54 +518,55 @@ function setupModalHandlers() {
     });
 }
 
-// Tab Switching (FIXED - Issue #4 fix + tab display bug)
+// Tab Switching - COMPLETE FIX for all 3 bugs
 function setupTabSwitching() {
     const tabButtons = document.querySelectorAll('.tab-button');
-    const allPanels = document.querySelectorAll('[role="tabpanel"]');
     
     tabButtons.forEach(button => {
         button.addEventListener('click', async () => {
             const sport = button.getAttribute('data-sport');
-            console.log(`🔄 Switching to ${sport} tab...`);
+            console.log(`🔄 Switching to ${sport.toUpperCase()} tab...`);
             
-            // Update tab buttons
+            // BUG FIX #1: Update tab button states
             tabButtons.forEach(btn => {
                 btn.classList.remove('active');
                 btn.setAttribute('aria-selected', 'false');
             });
-            
-            // Hide ALL panels
-            allPanels.forEach(panel => {
-                panel.classList.remove('active');
-                panel.setAttribute('hidden', '');
-                panel.style.display = 'none';
-            });
-            
-            // Show selected panel
             button.classList.add('active');
             button.setAttribute('aria-selected', 'true');
-            const panel = document.getElementById(`${sport}-panel`);
-            if (panel) {
-                panel.classList.add('active');
-                panel.removeAttribute('hidden');
-                panel.style.display = 'block';
-                console.log(`✅ Panel ${sport}-panel is now visible`);
-            } else {
-                console.error(`❌ Panel not found: ${sport}-panel`);
-            }
             
-            // Update state and refresh
+            // BUG FIX #1: Hide ALL .tab-content panels (matches CSS selector)
+            const allTabContents = document.querySelectorAll('.tab-content');
+            allTabContents.forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // BUG FIX #1: Show the selected panel (matches CSS .tab-content.active)
+            const selectedPanel = document.getElementById(`${sport}-panel`);
+            if (!selectedPanel) {
+                console.error(`❌ Panel not found: ${sport}-panel`);
+                return;
+            }
+            selectedPanel.classList.add('active');
+            console.log(`✅ Panel ${sport}-panel is now visible`);
+            
+            // Update state
             stopAutoRefresh();
             activeSport = sport;
             
-            // Load data if not cached
-            if (!window.sportsData || !window.sportsData[sport]) {
-                console.log(`📥 Loading ${sport} data...`);
-                await loadLiveScores(sport);
+            // BUG FIX #2: ALWAYS fetch data when switching tabs (no conditional)
+            console.log(`📥 Loading ${sport} data...`);
+            const container = document.getElementById(`${sport}-games`);
+            if (container) {
+                container.innerHTML = '<div class="loading">⏳ Loading scores...</div>';
             }
             
-            // Render games
+            await loadLiveScores(sport);
+            
+            // BUG FIX #3: Render games AFTER data is loaded
             renderGames(sport);
+            
+            // Restart auto-refresh for new sport
             startAutoRefresh();
         });
     });
@@ -625,5 +628,6 @@ window.addEventListener('load', () => {
         console.log(`🏆 Sports: Soccer, NBA, NFL, Tennis, Hockey, Baseball, Cricket, MMA`);
         console.log(`👆 Click any game card for detailed view`);
         console.log(`🔒 Security: XSS protection enabled, CSP active`);
+        console.log(`🐛 Tab Navigation: All 3 bugs fixed`);
     }
 });
