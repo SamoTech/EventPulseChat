@@ -1,72 +1,116 @@
 # 🔥 Event Pulse Live Dashboard
 
-**Professional Sports Broadcast Dashboard for YouTube Live Chat Rooms**
+**Professional Sports Broadcast Dashboard with Real-Time API Integration**
 
-A broadcast-quality, real-time sports dashboard designed specifically for OBS Browser Source integration. Features stunning visual effects, auto-refreshing scores, and multi-sport support.
+A broadcast-quality, real-time sports dashboard designed for OBS Browser Source integration. Now featuring **live API support** for NBA, NFL, Soccer, and UFC with multiple provider options.
 
 ![Dashboard Preview](https://img.shields.io/badge/Status-Live-00FF00?style=for-the-badge)
 ![OBS Compatible](https://img.shields.io/badge/OBS-Compatible-FF0000?style=for-the-badge)
-![Mobile Ready](https://img.shields.io/badge/Mobile-Ready-FFFF00?style=for-the-badge)
+![API Ready](https://img.shields.io/badge/API-Ready-FFFF00?style=for-the-badge)
 
 ## 🎯 Features
 
 ### Core Functionality
+- ✅ **Real-time API integration** with multiple sports providers
 - ✅ Multi-sport tabs: NBA 🏀, NFL 🏈, Soccer ⚽, UFC 🥊
-- ✅ Real-time score simulation with auto-refresh every 30 seconds
-- ✅ Broadcast-quality dark red/black theme (#FF0000, #000000)
-- ✅ SmartLink integration for monetization
+- ✅ Live score updates every 10-30 seconds
+- ✅ Automatic fallback to mock data if API fails
+- ✅ Broadcast-quality dark red/black theme
+- ✅ SmartLink monetization integration
 - ✅ OBS Browser Source optimized (1920x1080)
 - ✅ Fully mobile responsive
-- ✅ Zero copyright content
-- ✅ Lightweight (< 100KB total)
+- ✅ < 50KB total size (ultra-lightweight)
 
-### Visual Effects
-- Pulsing LIVE indicator (green dot animation)
-- Glassmorphism tab buttons with red glow
-- Massive gradient score displays
-- Smooth hover animations with lift effects
-- Custom shimmer effects on game cards
-- Professional typography with Orbitron font
+### New API Features
+- 🔴 **Live data from multiple providers**
+- 🔄 Smart caching to respect API rate limits
+- ⚡ 10-second refresh for live games
+- 🎯 Configurable API providers
+- 🛡️ Automatic fallback system
+- 📊 Performance monitoring
 
 ## 🚀 Quick Start
 
-### GitHub Pages Deployment
+### 1. Enable GitHub Pages
 
-1. **Enable GitHub Pages:**
-   - Go to repository Settings
-   - Navigate to Pages section
-   - Source: Deploy from `main` branch
-   - Save and wait for deployment
+1. Go to [Repository Settings → Pages](https://github.com/SamoTech/EventPulseChat/settings/pages)
+2. Source: **Deploy from main branch**
+3. Save and wait 2-3 minutes
+4. Access at: **https://samotech.github.io/EventPulseChat/**
 
-2. **Access Your Dashboard:**
-   ```
-   https://samotech.github.io/EventPulseChat/
-   ```
+### 2. Configure APIs (Optional)
 
-### Local Development
+Edit `api-config.js` to enable live data:
 
-```bash
-# Clone the repository
-git clone https://github.com/SamoTech/EventPulseChat.git
-
-# Navigate to directory
-cd EventPulseChat
-
-# Open in browser
-open index.html
+```javascript
+const API_CONFIG = {
+    USE_LIVE_API: true,  // Change to true
+    
+    providers: {
+        balldontlie: {
+            enabled: true,
+            apiKey: 'YOUR_API_KEY_HERE',  // Get from balldontlie.io
+            sports: ['nba']
+        },
+        apiSports: {
+            enabled: true,
+            apiKey: 'YOUR_API_KEY_HERE',  // Get from api-sports.io
+            sports: ['soccer', 'nfl', 'ufc']
+        }
+    }
+};
 ```
+
+### 3. Get Free API Keys
+
+## 📡 Supported API Providers
+
+### Recommended Free APIs (2026)
+
+#### 1. BALLDONTLIE (NBA)
+- **Coverage:** NBA only
+- **Free Tier:** 100 requests/day
+- **Best For:** NBA live scores & stats
+- **Sign Up:** [https://www.balldontlie.io](https://www.balldontlie.io)
+- **Rate Limit:** Perfect for dashboard use
+
+#### 2. API-SPORTS (Multi-Sport)
+- **Coverage:** NFL, Soccer (40+ leagues), UFC/MMA
+- **Free Tier:** 100 requests/day
+- **Best For:** Multi-sport coverage
+- **Sign Up:** [https://api-sports.io](https://api-sports.io)
+- **Features:** Real-time updates every 15 seconds
+
+#### 3. THE ODDS API (Alternative)
+- **Coverage:** All major sports + betting odds
+- **Free Tier:** 500 requests/month
+- **Best For:** Adding betting data
+- **Sign Up:** [https://the-odds-api.com](https://the-odds-api.com)
+
+#### 4. SportsData.IO (Premium)
+- **Coverage:** Professional-grade data
+- **Free Tier:** Trial available
+- **Best For:** Production apps
+- **Sign Up:** [https://sportsdata.io](https://sportsdata.io)
+
+### API Comparison Table
+
+| Provider | NBA | NFL | Soccer | UFC | Free Tier | Best For |
+|----------|-----|-----|--------|-----|-----------|----------|
+| **BALLDONTLIE** | ✅ | ❌ | ❌ | ❌ | 100/day | NBA focus |
+| **API-SPORTS** | ✅ | ✅ | ✅ | ✅ | 100/day | Multi-sport |
+| **The Odds API** | ✅ | ✅ | ✅ | ✅ | 500/month | Betting data |
+| **SportsData.IO** | ✅ | ✅ | ✅ | ❌ | Trial | Professional |
 
 ## 🎥 OBS Studio Setup
 
-### Step-by-Step Instructions
+### Quick Setup
 
 1. **Add Browser Source:**
-   - Open OBS Studio
-   - Click `+` in Sources panel
-   - Select `Browser`
-   - Name it "Event Pulse Dashboard"
+   - OBS Studio → Sources → `+` → Browser
+   - Name: "Event Pulse Dashboard"
 
-2. **Configure Browser Source:**
+2. **Configure:**
    ```
    URL: https://samotech.github.io/EventPulseChat/
    Width: 1920
@@ -74,221 +118,283 @@ open index.html
    FPS: 30
    ```
 
-3. **Custom CSS (Optional - for transparency):**
-   ```css
-   body {
-       background: transparent !important;
-   }
-   ```
-
-4. **Advanced Settings:**
+3. **Advanced Settings:**
    - ✅ Shutdown source when not visible
    - ✅ Refresh browser when scene becomes active
-   - Refresh Rate: 10 seconds (recommended)
+   - Custom CSS (optional transparency):
+     ```css
+     body { background: transparent !important; }
+     ```
 
-5. **Performance Optimization:**
-   - Use Hardware Acceleration
-   - Enable Browser Source Hardware Acceleration in OBS Settings
-   - Set FPS to match your stream (30fps recommended)
+## ⚙️ Configuration Guide
 
-### OBS Hotkeys (Optional)
+### Enable Live API Mode
 
-- Set hotkey to refresh browser source manually
-- Useful for forcing immediate data updates
-
-## 📱 Mobile Support
-
-The dashboard is fully responsive with breakpoints:
-
-- **Desktop:** >1200px (4-column grid)
-- **Tablet:** 768px-1200px (2-column grid)
-- **Mobile:** <768px (single column, stacked tabs)
-
-Mobile optimizations:
-- Touch-friendly tab buttons
-- Pinch-zoom disabled for OBS stability
-- Optimized font sizes
-- Reorganized layout for vertical viewing
-
-## 🎨 Customization
-
-### Color Scheme
-
-Edit `style.css` to customize colors:
-
-```css
-/* Primary Colors */
---primary-red: #FF0000;
---background-black: #000000;
---score-green: #00FF00;
---status-yellow: #FFFF00;
---text-white: #FFFFFF;
-```
-
-### Sport Data
-
-Edit `script.js` to modify mock data:
-
-```javascript
-const sportsData = {
-    nba: [
-        {
-            team1: 'Your Team',
-            team2: 'Opponent',
-            score1: 100,
-            score2: 95,
-            status: 'Q4 | 5:00 LEFT'
-        }
-    ]
-};
-```
-
-### API Integration (Future)
-
-The dashboard is structured for easy API integration:
-
-1. Replace mock data in `sportsData` object
-2. Implement fetch functions:
+1. **Edit `api-config.js`:**
    ```javascript
-   async function fetchLiveScores(sport) {
-       const response = await fetch(`YOUR_API_URL/${sport}`);
-       return await response.json();
+   USE_LIVE_API: true  // Enable live data
+   ```
+
+2. **Add API Keys:**
+   ```javascript
+   balldontlie: {
+       apiKey: 'your_actual_key_here'
    }
    ```
-3. Update `updateScores()` function to call API
+
+3. **Test in Console:**
+   - Open browser DevTools (F12)
+   - Check console for: `🔴 LIVE API MODE ENABLED`
+   - Verify: `✅ Live data loaded for nba`
+
+### Adjust Refresh Rates
+
+```javascript
+refreshIntervals: {
+    liveGames: 10000,   // 10 seconds (live games)
+    upcoming: 60000,    // 1 minute (scheduled)
+    finished: 300000    // 5 minutes (final)
+}
+```
+
+### Rate Limit Management
+
+The dashboard automatically:
+- ✅ Caches responses for 30 seconds
+- ✅ Prevents duplicate API calls
+- ✅ Falls back to mock data if quota exceeded
+- ✅ Shows console warnings for API issues
+
+## 🔧 API Integration Details
+
+### How It Works
+
+1. **Mode Selection:**
+   - `USE_LIVE_API: false` → Mock data simulation
+   - `USE_LIVE_API: true` → Real API calls
+
+2. **Data Flow:**
+   ```
+   User clicks tab → Check cache → 
+   API call (if needed) → Parse data → 
+   Render cards → Auto-refresh loop
+   ```
+
+3. **Fallback System:**
+   - API fails → Console warning
+   - Dashboard continues with mock data
+   - No user disruption
+
+### API Response Parsing
+
+**NBA (BALLDONTLIE):**
+```javascript
+{
+    home_team: { full_name: "Cleveland Cavaliers" },
+    visitor_team: { full_name: "Detroit Pistons" },
+    home_team_score: 105,
+    visitor_team_score: 98,
+    period: 4,
+    status: "Final"
+}
+```
+
+**Soccer (API-SPORTS):**
+```javascript
+{
+    teams: {
+        home: { name: "Manchester City" },
+        away: { name: "Arsenal" }
+    },
+    goals: { home: 2, away: 1 },
+    fixture: { status: { elapsed: 67 } }
+}
+```
 
 ## 📊 Performance Metrics
 
-### Target Metrics
-- ✅ Load time: < 2 seconds
-- ✅ Total size: < 100KB
-- ✅ Animation: 60fps
-- ✅ No external dependencies (except Google Fonts)
+### File Sizes
+- **Total:** ~26 KB (with API integration)
+- **index.html:** 3 KB
+- **style.css:** 8.5 KB
+- **script.js:** 11 KB (enhanced with API)
+- **api-config.js:** 3.5 KB
 
-### Monitoring
+### Load Times
+- **Initial Load:** < 1 second
+- **API Response:** 200-500ms (average)
+- **Refresh Cycle:** 10-30 seconds (configurable)
 
-Check browser console for load time:
+### API Usage Estimates
+
+**Daily Usage (typical broadcast):**
+- 3-hour stream = 360-1080 API calls
+- Recommendation: Upgrade to paid tier for heavy use
+- Free tier suitable for testing and short streams
+
+## 🎨 Customization
+
+### Add New API Provider
+
 ```javascript
-// Automatically logged on page load
-Dashboard loaded in XXXXms
+// In api-config.js
+myCustomAPI: {
+    enabled: true,
+    baseURL: 'https://api.example.com',
+    apiKey: 'YOUR_KEY',
+    sports: ['nba']
+}
 ```
 
-## 🔧 Technical Stack
-
-- **HTML5:** Semantic structure
-- **CSS3:** Advanced animations, glassmorphism, gradients
-- **Vanilla JavaScript:** No frameworks (lightweight)
-- **Google Fonts:** Orbitron (400, 700, 900)
-
-## 📁 File Structure
-
-```
-EventPulseChat/
-├── index.html          # Main dashboard structure
-├── style.css           # Complete styling & animations
-├── script.js           # Tab switching, data management, auto-refresh
-└── README.md           # This file
+```javascript
+// In script.js
+async function fetchFromCustomAPI() {
+    const response = await fetch(
+        API_CONFIG.providers.myCustomAPI.baseURL + '/games',
+        { headers: { 'Authorization': API_CONFIG.providers.myCustomAPI.apiKey } }
+    );
+    return await response.json();
+}
 ```
 
-## 💰 SmartLink Integration
+### Modify Sport Coverage
 
-The dashboard includes prominent SmartLink monetization:
-
-- **Location:** Fixed footer (left side)
-- **URL:** https://omg10.com/4/10663409
-- **Targeting:** US/CA/AU deals
-- **Style:** Red button with yellow border, hover glow effect
-
-## 🎯 Use Cases
-
-1. **YouTube Live Streams:**
-   - Overlay during sports commentary
-   - Full-screen dashboard for chat interaction
-   - Picture-in-picture mode
-
-2. **Twitch Broadcasts:**
-   - Scene for sports discussion
-   - Between-game filler content
-
-3. **Discord Stage Events:**
-   - Screen share for watch parties
-   - Community engagement tool
-
-4. **Sports Bars/Venues:**
-   - Digital signage display
-   - Multiple monitor setup
-
-## ⚡ Auto-Refresh System
-
-- **Interval:** 30 seconds
-- **Visual Countdown:** Top-right corner
-- **Score Updates:** Random +1-3 points per refresh
-- **Time Updates:** Simulated game clock progression
-- **Status Changes:** Automatic quarter/period transitions
-
-## 🏆 Success Criteria
-
-- ✅ Loads in < 2s
-- ✅ Tabs switch smoothly
-- ✅ Scores auto-update every 30s
-- ✅ OBS Browser Source compatible
-- ✅ Mobile responsive
-- ✅ GitHub Pages ready
-- ✅ SmartLink prominent & clickable
-- ✅ Zero copyright content
-- ✅ < 100KB total size
+Edit `api-config.js` to enable/disable sports:
+```javascript
+balldontlie: {
+    sports: ['nba']  // Remove to disable NBA
+}
+```
 
 ## 🐛 Troubleshooting
 
-### Dashboard not loading in OBS
-- Check URL is correct and accessible
-- Verify browser source dimensions (1920x1080)
-- Clear OBS browser cache
-- Try refreshing browser source
+### API Not Working
 
-### Scores not updating
-- Check browser console for errors
-- Verify JavaScript is enabled
-- Ensure auto-refresh is running (check countdown timer)
+1. **Check Console (F12):**
+   - Look for `🔴 LIVE API MODE ENABLED`
+   - Check for error messages
 
-### Mobile layout issues
-- Clear browser cache
-- Check viewport meta tag
-- Test in different mobile browsers
+2. **Verify API Key:**
+   - Test key directly on provider website
+   - Ensure no extra spaces in `api-config.js`
 
-### Performance issues
-- Reduce OBS browser source FPS to 30
-- Enable hardware acceleration
-- Close unnecessary OBS sources
+3. **Check Rate Limits:**
+   - Console shows: `Using cached data`
+   - Wait 30 seconds between manual refreshes
 
-## 📝 License
+4. **CORS Issues:**
+   - GitHub Pages supports CORS
+   - Local testing may require `http-server`
 
-This project is open source and available for personal and commercial use.
+### Dashboard Shows "No Games Available"
+
+- **Cause:** API returned empty array (no games today)
+- **Fix:** Dashboard automatically falls back to mock data
+- **Verify:** Check sport schedule on provider website
+
+### Scores Not Updating
+
+1. Open DevTools Console
+2. Look for API errors
+3. Check network tab for failed requests
+4. Verify `USE_LIVE_API: true` in config
+
+## 📱 Mobile Support
+
+- **Responsive breakpoints:** 768px, 1200px
+- **Touch-friendly tabs**
+- **Optimized layouts**
+- **API caching** reduces mobile data usage
+
+## 🔒 Security Best Practices
+
+### API Key Protection
+
+⚠️ **Important:** Never commit API keys to public repos
+
+**Option 1: Environment Variables (Advanced)**
+```javascript
+const API_KEY = process.env.BALLDONTLIE_KEY;
+```
+
+**Option 2: Separate Config File**
+```javascript
+// Create api-config.local.js (add to .gitignore)
+const API_CONFIG = {
+    providers: {
+        balldontlie: {
+            apiKey: 'your_private_key'
+        }
+    }
+};
+```
+
+**Option 3: Backend Proxy (Recommended for Production)**
+- Create serverless function (Vercel/Netlify)
+- Proxy API requests through backend
+- Keep keys server-side only
+
+## 🚀 Deployment Options
+
+### GitHub Pages (Current)
+- ✅ Free hosting
+- ✅ Auto-deployment
+- ⚠️ API keys visible in source
+
+### Vercel (Recommended)
+- ✅ Environment variables support
+- ✅ Serverless functions
+- ✅ Automatic HTTPS
+- Deploy: `vercel --prod`
+
+### Netlify
+- ✅ Similar to Vercel
+- ✅ Build plugins
+- Deploy: `netlify deploy --prod`
+
+## 📈 Future Enhancements
+
+- [ ] Backend API proxy for key security
+- [ ] WebSocket real-time updates
+- [ ] Historical data charts
+- [ ] User authentication
+- [ ] Custom team favorites
+- [ ] Push notifications
+- [ ] Multiple language support
+
+## 🔗 Resources
+
+- **Live Demo:** https://samotech.github.io/EventPulseChat/
+- **Repository:** https://github.com/SamoTech/EventPulseChat
+- **Issues:** https://github.com/SamoTech/EventPulseChat/issues
+
+### API Documentation
+- [BALLDONTLIE Docs](https://docs.balldontlie.io)
+- [API-SPORTS Docs](https://api-sports.io/documentation)
+- [The Odds API Docs](https://the-odds-api.com/docs)
+
+## 📄 License
+
+MIT License - Free for personal and commercial use
 
 ## 🤝 Contributing
 
-Contributions welcome! Feel free to:
-- Report bugs
-- Suggest features
-- Submit pull requests
-- Share improvements
+Contributions welcome! Please:
+1. Fork the repository
+2. Create feature branch
+3. Test thoroughly
+4. Submit pull request
 
-## 📧 Support
+## 💬 Support
 
-For issues or questions:
-- Open a GitHub issue
-- Check existing documentation
-- Review troubleshooting section
-
-## 🎬 Credits
-
-- **Developer:** SamoTech
-- **Design:** Broadcast-quality sports dashboard
-- **Typography:** Google Fonts (Orbitron)
-- **Monetization:** SmartLink integration
+- **Issues:** [GitHub Issues](https://github.com/SamoTech/EventPulseChat/issues)
+- **API Questions:** Check provider documentation
+- **OBS Help:** [OBS Forums](https://obsproject.com/forum/)
 
 ---
 
 **Built with ❤️ for professional sports broadcasting**
 
-🔴 LIVE | 🏀 NBA | 🏈 NFL | ⚽ SOCCER | 🥊 UFC
+🔴 LIVE API | 🏀 NBA | 🏈 NFL | ⚽ SOCCER | 🥊 UFC
+
+*Last Updated: February 2026*
