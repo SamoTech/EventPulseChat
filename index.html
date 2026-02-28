@@ -10,170 +10,225 @@
   <link rel="canonical" href="https://samotech.github.io/EventPulseChat/">
 
   <!-- Open Graph -->
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="Event Pulse — Live Sports Dashboard">
-  <meta property="og:description" content="Real-time scores for 10+ sports including NFL, NBA, Soccer, UFC, Tennis, NHL, MLB, Cricket. No login.">
-  <meta property="og:url" content="https://samotech.github.io/EventPulseChat/">
-  <meta property="og:image" content="https://samotech.github.io/EventPulseChat/og-image.png">
-
-  <!-- Twitter -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Event Pulse — Live Sports Dashboard">
-  <meta name="twitter:description" content="Real-time scores for NFL, NBA, Soccer, UFC and more.">
+  <meta property="og:type"        content="website">
+  <meta property="og:title"       content="Event Pulse — Live Sports Dashboard">
+  <meta property="og:description" content="Real-time scores for 10+ sports. No login needed.">
+  <meta property="og:url"         content="https://samotech.github.io/EventPulseChat/">
 
   <!-- Security -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; connect-src 'self' https://site.api.espn.com https://a.espncdn.com; img-src 'self' https://a.espncdn.com https://a1.espncdn.com https://a2.espncdn.com https://a3.espncdn.com https://a4.espncdn.com data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-ancestors 'none';">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
 
-  <!-- PWA -->
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#1A0000">
-  <meta name="apple-mobile-web-app-capable" content="yes">
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Event Pulse Live Dashboard",
+    "url": "https://samotech.github.io/EventPulseChat/",
+    "description": "Real-time sports scores for 10+ leagues",
+    "applicationCategory": "SportsApplication",
+    "operatingSystem": "Any",
+    "offers": { "@type": "Offer", "price": "0" }
+  }
+  </script>
 
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
-
-  <!-- Styles -->
   <link rel="stylesheet" href="style.css">
-
-  <!-- DOMPurify for XSS Protection -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js" integrity="sha512-KqUc8p23dJsVP6fWjf/MaeJZZmLOyABhw2/MyA0QXwXNUeilh7jVYCU/J3qcM/OZldj9uwbn2jkJcJJz7WVmWA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
-
 <body>
-  <!-- Fixed Header -->
-  <header class="header">
-    <div class="header-content">
-      <div class="live-indicator">
-        <span class="pulse-dot" role="status" aria-label="Live status"></span>
-        <span class="live-text">LIVE</span>
+
+  <!-- ── Header ───────────────────────────────────────────────────────────── -->
+  <header class="header" role="banner">
+    <div class="header-inner">
+      <div class="live-indicator" aria-label="Live">
+        <span class="live-dot" aria-hidden="true"></span>
+        LIVE
       </div>
-      <h1 class="header-title">🔥 LIVE SPORTS DASHBOARD - 10+ SPORTS</h1>
-      <div class="refresh-indicator" id="refreshTimer" role="status" aria-live="polite">Next: 30s</div>
+      <h1>🔥 LIVE SPORTS DASHBOARD</h1>
+      <div class="countdown-display">
+        Next update: <span id="countdown" aria-live="polite" aria-atomic="true">30s</span>
+      </div>
     </div>
   </header>
 
-  <div class="main-container">
-    <!-- Left Sidebar Tabs -->
-    <aside class="sidebar" role="tablist" aria-label="Sport selection">
-      <button class="tab-button active" data-sport="soccer" role="tab" aria-selected="true" aria-controls="soccer" id="tab-soccer">
+  <!-- ── Tab Navigation ───────────────────────────────────────────────────── -->
+  <nav class="tabs-nav" aria-label="Sport selection">
+    <div role="tablist" class="tabs-list">
+
+      <button class="tab-button active"
+              role="tab"
+              aria-selected="true"
+              aria-controls="soccer"
+              id="tab-soccer"
+              data-sport="soccer">
         <span class="tab-icon" aria-hidden="true">⚽</span>
         <span class="tab-label">SOCCER</span>
       </button>
-      <button class="tab-button" data-sport="nba" role="tab" aria-selected="false" aria-controls="nba" id="tab-nba">
+
+      <button class="tab-button"
+              role="tab"
+              aria-selected="false"
+              aria-controls="nba"
+              id="tab-nba"
+              data-sport="nba">
         <span class="tab-icon" aria-hidden="true">🏀</span>
         <span class="tab-label">NBA</span>
       </button>
-      <button class="tab-button" data-sport="nfl" role="tab" aria-selected="false" aria-controls="nfl" id="tab-nfl">
+
+      <button class="tab-button"
+              role="tab"
+              aria-selected="false"
+              aria-controls="nfl"
+              id="tab-nfl"
+              data-sport="nfl">
         <span class="tab-icon" aria-hidden="true">🏈</span>
         <span class="tab-label">NFL</span>
       </button>
-      <button class="tab-button" data-sport="tennis" role="tab" aria-selected="false" aria-controls="tennis" id="tab-tennis">
+
+      <button class="tab-button"
+              role="tab"
+              aria-selected="false"
+              aria-controls="tennis"
+              id="tab-tennis"
+              data-sport="tennis">
         <span class="tab-icon" aria-hidden="true">🎾</span>
         <span class="tab-label">TENNIS</span>
       </button>
-      <button class="tab-button" data-sport="hockey" role="tab" aria-selected="false" aria-controls="hockey" id="tab-hockey">
+
+      <button class="tab-button"
+              role="tab"
+              aria-selected="false"
+              aria-controls="hockey"
+              id="tab-hockey"
+              data-sport="hockey">
         <span class="tab-icon" aria-hidden="true">🏒</span>
         <span class="tab-label">HOCKEY</span>
       </button>
-      <button class="tab-button" data-sport="baseball" role="tab" aria-selected="false" aria-controls="baseball" id="tab-baseball">
+
+      <button class="tab-button"
+              role="tab"
+              aria-selected="false"
+              aria-controls="baseball"
+              id="tab-baseball"
+              data-sport="baseball">
         <span class="tab-icon" aria-hidden="true">⚾</span>
         <span class="tab-label">BASEBALL</span>
       </button>
-      <button class="tab-button" data-sport="cricket" role="tab" aria-selected="false" aria-controls="cricket" id="tab-cricket">
+
+      <button class="tab-button"
+              role="tab"
+              aria-selected="false"
+              aria-controls="cricket"
+              id="tab-cricket"
+              data-sport="cricket">
         <span class="tab-icon" aria-hidden="true">🏏</span>
         <span class="tab-label">CRICKET</span>
       </button>
-      <button class="tab-button" data-sport="mma" role="tab" aria-selected="false" aria-controls="mma" id="tab-mma">
-        <span class="tab-icon" aria-hidden="true">🥊</span>
-        <span class="tab-label">MMA/UFC</span>
-      </button>
-    </aside>
 
-    <!-- Content Area -->
-    <main class="content">
-      <!-- Soccer Tab -->
-      <div class="tab-content active" id="soccer" role="tabpanel" aria-labelledby="tab-soccer">
-        <div class="sport-header"><h2>⚽ Premier League & Top Leagues</h2></div>
-        <div class="games-grid" id="soccer-games">
-          <div class="loading" role="status">Loading live scores...</div>
-        </div>
+    </div>
+  </nav>
+
+  <!-- ── Tab Content Panels ────────────────────────────────────────────────── -->
+  <main class="main-content">
+
+    <div id="soccer"   class="tab-content" role="tabpanel" aria-labelledby="tab-soccer">
+      <div class="sport-header"><h2>⚽ Premier League &amp; Top Leagues</h2></div>
+      <div class="games-grid" id="soccer-games">Loading live scores...</div>
+    </div>
+
+    <div id="nba"      class="tab-content" role="tabpanel" aria-labelledby="tab-nba"   style="display:none">
+      <div class="sport-header"><h2>🏀 NBA Live Games</h2></div>
+      <div class="games-grid" id="nba-games">Loading live scores...</div>
+    </div>
+
+    <div id="nfl"      class="tab-content" role="tabpanel" aria-labelledby="tab-nfl"   style="display:none">
+      <div class="sport-header"><h2>🏈 NFL Live Games</h2></div>
+      <div class="games-grid" id="nfl-games">Loading live scores...</div>
+    </div>
+
+    <div id="tennis"   class="tab-content" role="tabpanel" aria-labelledby="tab-tennis" style="display:none">
+      <div class="sport-header"><h2>🎾 ATP &amp; WTA Live Matches</h2></div>
+      <div class="games-grid" id="tennis-games">Loading live scores...</div>
+    </div>
+
+    <div id="hockey"   class="tab-content" role="tabpanel" aria-labelledby="tab-hockey" style="display:none">
+      <div class="sport-header"><h2>🏒 NHL Live Games</h2></div>
+      <div class="games-grid" id="hockey-games">Loading live scores...</div>
+    </div>
+
+    <div id="baseball" class="tab-content" role="tabpanel" aria-labelledby="tab-baseball" style="display:none">
+      <div class="sport-header"><h2>⚾ MLB Live Games</h2></div>
+      <div class="games-grid" id="baseball-games">Loading live scores...</div>
+    </div>
+
+    <div id="cricket"  class="tab-content" role="tabpanel" aria-labelledby="tab-cricket" style="display:none">
+      <div class="sport-header"><h2>🏏 International Cricket</h2></div>
+      <div class="games-grid" id="cricket-games">Loading live scores...</div>
+    </div>
+
+  </main>
+
+  <!-- ── Game Detail Modal ─────────────────────────────────────────────────── -->
+  <div id="game-modal"
+       class="modal-overlay"
+       role="dialog"
+       aria-modal="true"
+       aria-labelledby="modal-event-name"
+       hidden>
+
+    <div class="modal-box">
+      <button id="modal-close"
+              class="modal-close-btn"
+              aria-label="Close game details">✕</button>
+
+      <h2 id="modal-event-name" class="modal-title"></h2>
+
+      <!-- Date / time + status row -->
+      <div class="modal-datetime-row">
+        <span id="modal-datetime" class="modal-datetime"></span>
+        <span id="modal-status"   class="modal-status-badge"></span>
       </div>
 
-      <!-- NBA Tab -->
-      <div class="tab-content" id="nba" role="tabpanel" aria-labelledby="tab-nba">
-        <div class="sport-header"><h2>🏀 NBA Live Games</h2></div>
-        <div class="games-grid" id="nba-games">
-          <div class="loading" role="status">Loading live scores...</div>
+      <!-- Scoreline: away | score | home  — all horizontal -->
+      <div class="modal-scoreline">
+
+        <!-- Away team -->
+        <div class="modal-team">
+          <img id="modal-away-logo" class="modal-team-logo" src="" alt="" width="64" height="64">
+          <span id="modal-away-name"   class="modal-team-name"></span>
+          <span id="modal-away-abbr"   class="modal-team-abbr"></span>
+          <span id="modal-away-record" class="modal-team-record"></span>
         </div>
+
+        <!-- Score block in the middle -->
+        <div class="modal-scores">
+          <span id="modal-away-score" class="modal-score"></span>
+          <span class="modal-score-dash">–</span>
+          <span id="modal-home-score" class="modal-score"></span>
+        </div>
+
+        <!-- Home team -->
+        <div class="modal-team">
+          <img id="modal-home-logo" class="modal-team-logo" src="" alt="" width="64" height="64">
+          <span id="modal-home-name"   class="modal-team-name"></span>
+          <span id="modal-home-abbr"   class="modal-team-abbr"></span>
+          <span id="modal-home-record" class="modal-team-record"></span>
+        </div>
+
       </div>
 
-      <!-- NFL Tab -->
-      <div class="tab-content" id="nfl" role="tabpanel" aria-labelledby="tab-nfl">
-        <div class="sport-header"><h2>🏈 NFL Live Games</h2></div>
-        <div class="games-grid" id="nfl-games">
-          <div class="loading" role="status">Loading live scores...</div>
-        </div>
-      </div>
-
-      <!-- Tennis Tab -->
-      <div class="tab-content" id="tennis" role="tabpanel" aria-labelledby="tab-tennis">
-        <div class="sport-header"><h2>🎾 ATP & WTA Live Matches</h2></div>
-        <div class="games-grid" id="tennis-games">
-          <div class="loading" role="status">Loading live scores...</div>
-        </div>
-      </div>
-
-      <!-- Hockey Tab -->
-      <div class="tab-content" id="hockey" role="tabpanel" aria-labelledby="tab-hockey">
-        <div class="sport-header"><h2>🏒 NHL Live Games</h2></div>
-        <div class="games-grid" id="hockey-games">
-          <div class="loading" role="status">Loading live scores...</div>
-        </div>
-      </div>
-
-      <!-- Baseball Tab -->
-      <div class="tab-content" id="baseball" role="tabpanel" aria-labelledby="tab-baseball">
-        <div class="sport-header"><h2>⚾ MLB Live Games</h2></div>
-        <div class="games-grid" id="baseball-games">
-          <div class="loading" role="status">Loading live scores...</div>
-        </div>
-      </div>
-
-      <!-- Cricket Tab -->
-      <div class="tab-content" id="cricket" role="tabpanel" aria-labelledby="tab-cricket">
-        <div class="sport-header"><h2>🏏 International Cricket</h2></div>
-        <div class="games-grid" id="cricket-games">
-          <div class="loading" role="status">Loading live scores...</div>
-        </div>
-      </div>
-
-      <!-- MMA Tab -->
-      <div class="tab-content" id="mma" role="tabpanel" aria-labelledby="tab-mma">
-        <div class="sport-header"><h2>🥊 UFC & MMA Events</h2></div>
-        <div class="games-grid" id="mma-games">
-          <div class="loading" role="status">Loading live scores...</div>
-        </div>
-      </div>
-    </main>
-  </div>
-
-  <!-- Game Detail Modal -->
-  <div id="gameModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" hidden>
-    <div class="modal-container">
-      <div id="modalContent" class="modal-body"></div>
+      <dl class="modal-meta">
+        <dt>🏟️ Venue</dt>      <dd id="modal-venue"></dd>
+        <dt>👥 Attendance</dt> <dd id="modal-attendance"></dd>
+        <dt>📺 Broadcast</dt>  <dd id="modal-broadcast"></dd>
+        <dt>🏆 League</dt>     <dd id="modal-league"></dd>
+      </dl>
     </div>
   </div>
 
-  <!-- Footer -->
+  <!-- ── Footer ───────────────────────────────────────────────────────────── -->
   <footer class="footer">
-    <div class="epc-logo"><span>EPC</span></div>
-    <div style="font-size:11px;color:#888;text-align:center;">
-      Data from ESPN · Updates every 30s · Open Source
-    </div>
+    <span>EPC — Event Pulse Chat &copy; 2026</span>
   </footer>
 
   <script src="script-simple.js"></script>
